@@ -1,13 +1,59 @@
 CREATE TYPE perfil_usuario AS ENUM ('admin','editor','aluno');
 CREATE TYPE status_publicacao AS ENUM ('rascunho','publicado','arquivado');
-CREATE TABLE usuarios (id BIGSERIAL PRIMARY KEY,nome VARCHAR(120) NOT NULL,email VARCHAR(180) NOT NULL UNIQUE,senha_hash VARCHAR(255) NOT NULL,perfil perfil_usuario NOT NULL DEFAULT 'aluno',ativo BOOLEAN NOT NULL DEFAULT TRUE,criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
-CREATE TABLE categorias (id BIGSERIAL PRIMARY KEY,nome VARCHAR(80) NOT NULL,slug VARCHAR(100) NOT NULL UNIQUE,descricao TEXT,icone VARCHAR(80),ordem SMALLINT NOT NULL DEFAULT 0,ativo BOOLEAN NOT NULL DEFAULT TRUE,criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
-CREATE TABLE conteudos (id BIGSERIAL PRIMARY KEY,titulo VARCHAR(180) NOT NULL,slug VARCHAR(220) NOT NULL UNIQUE,resumo VARCHAR(500) NOT NULL,corpo TEXT NOT NULL,imagem_capa VARCHAR(255),link_youtube VARCHAR(255),categoria_id BIGINT NOT NULL REFERENCES categorias(id) ON DELETE RESTRICT,autor_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,status status_publicacao NOT NULL DEFAULT 'rascunho',destaque BOOLEAN NOT NULL DEFAULT FALSE,publicado_em TIMESTAMPTZ,criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),CONSTRAINT publicado_com_data CHECK (status <> 'publicado' OR publicado_em IS NOT NULL));
-CREATE TABLE tags (id BIGSERIAL PRIMARY KEY,nome VARCHAR(60) NOT NULL,slug VARCHAR(70) NOT NULL UNIQUE);
-CREATE TABLE conteudo_tags (conteudo_id BIGINT NOT NULL REFERENCES conteudos(id) ON DELETE CASCADE,tag_id BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,PRIMARY KEY(conteudo_id,tag_id));
-CREATE TABLE eventos (id BIGSERIAL PRIMARY KEY,titulo VARCHAR(180) NOT NULL,descricao TEXT NOT NULL,data_inicio TIMESTAMPTZ NOT NULL,data_fim TIMESTAMPTZ,local VARCHAR(180) NOT NULL,link_inscricao VARCHAR(255),autor_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,status status_publicacao NOT NULL DEFAULT 'rascunho',criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),CONSTRAINT periodo_evento_valido CHECK(data_fim IS NULL OR data_fim >= data_inicio));
-CREATE TABLE midias (id BIGSERIAL PRIMARY KEY,nome_arquivo VARCHAR(255) NOT NULL,caminho VARCHAR(500) NOT NULL UNIQUE,tipo_mime VARCHAR(100) NOT NULL,tamanho_bytes BIGINT NOT NULL CHECK(tamanho_bytes >= 0),enviado_por BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
-CREATE TABLE auditoria (id BIGSERIAL PRIMARY KEY,usuario_id BIGINT REFERENCES usuarios(id) ON DELETE SET NULL,acao VARCHAR(80) NOT NULL,tabela_afetada VARCHAR(80) NOT NULL,registro_id BIGINT,detalhes JSONB NOT NULL DEFAULT '{}'::jsonb,ip_origem INET,criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW());
-CREATE INDEX idx_conteudos_publicacao ON conteudos(status,publicado_em DESC); CREATE INDEX idx_conteudos_categoria ON conteudos(categoria_id); CREATE INDEX idx_conteudos_autor ON conteudos(autor_id); CREATE INDEX idx_eventos_inicio ON eventos(status,data_inicio); CREATE INDEX idx_eventos_autor ON eventos(autor_id); CREATE INDEX idx_auditoria_usuario ON auditoria(usuario_id,criado_em DESC);
-CREATE OR REPLACE FUNCTION atualizar_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.atualizado_em=NOW(); RETURN NEW; END; $$ LANGUAGE plpgsql;
-CREATE TRIGGER usuarios_atualizados BEFORE UPDATE ON usuarios FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp(); CREATE TRIGGER categorias_atualizadas BEFORE UPDATE ON categorias FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp(); CREATE TRIGGER conteudos_atualizados BEFORE UPDATE ON conteudos FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp(); CREATE TRIGGER eventos_atualizados BEFORE UPDATE ON eventos FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp();
+
+CREATE TABLE usuarios (
+    id BIGSERIAL PRIMARY KEY, nome VARCHAR(120) NOT NULL, email VARCHAR(180) NOT NULL UNIQUE,
+    senha_hash VARCHAR(255) NOT NULL, perfil perfil_usuario NOT NULL DEFAULT 'aluno', ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE categorias (
+    id BIGSERIAL PRIMARY KEY, nome VARCHAR(80) NOT NULL, slug VARCHAR(100) NOT NULL UNIQUE, descricao TEXT,
+    icone VARCHAR(80), ordem SMALLINT NOT NULL DEFAULT 0, ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE conteudos (
+    id BIGSERIAL PRIMARY KEY, titulo VARCHAR(180) NOT NULL, slug VARCHAR(220) NOT NULL UNIQUE, resumo VARCHAR(500) NOT NULL,
+    corpo TEXT NOT NULL, imagem_capa VARCHAR(255), link_youtube VARCHAR(255),
+    categoria_id BIGINT NOT NULL REFERENCES categorias(id) ON DELETE RESTRICT,
+    autor_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT,
+    status status_publicacao NOT NULL DEFAULT 'rascunho', destaque BOOLEAN NOT NULL DEFAULT FALSE,
+    publicado_em TIMESTAMPTZ, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT publicado_com_data CHECK (status <> 'publicado' OR publicado_em IS NOT NULL)
+);
+CREATE TABLE tags (id BIGSERIAL PRIMARY KEY, nome VARCHAR(60) NOT NULL, slug VARCHAR(70) NOT NULL UNIQUE);
+CREATE TABLE conteudo_tags (
+    conteudo_id BIGINT NOT NULL REFERENCES conteudos(id) ON DELETE CASCADE,
+    tag_id BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE, PRIMARY KEY(conteudo_id,tag_id)
+);
+CREATE TABLE eventos (
+    id BIGSERIAL PRIMARY KEY, titulo VARCHAR(180) NOT NULL, descricao TEXT NOT NULL, data_inicio TIMESTAMPTZ NOT NULL,
+    data_fim TIMESTAMPTZ, local VARCHAR(180) NOT NULL, link_inscricao VARCHAR(255),
+    autor_id BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT, status status_publicacao NOT NULL DEFAULT 'rascunho',
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(), atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT periodo_evento_valido CHECK(data_fim IS NULL OR data_fim >= data_inicio)
+);
+CREATE TABLE midias (
+    id BIGSERIAL PRIMARY KEY, nome_arquivo VARCHAR(255) NOT NULL, caminho VARCHAR(500) NOT NULL UNIQUE,
+    tipo_mime VARCHAR(100) NOT NULL, tamanho_bytes BIGINT NOT NULL CHECK(tamanho_bytes >= 0),
+    enviado_por BIGINT NOT NULL REFERENCES usuarios(id) ON DELETE RESTRICT, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE auditoria (
+    id BIGSERIAL PRIMARY KEY, usuario_id BIGINT REFERENCES usuarios(id) ON DELETE SET NULL, acao VARCHAR(80) NOT NULL,
+    tabela_afetada VARCHAR(80) NOT NULL, registro_id BIGINT, detalhes JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ip_origem INET, criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_conteudos_publicacao ON conteudos(status,publicado_em DESC);
+CREATE INDEX idx_conteudos_categoria ON conteudos(categoria_id);
+CREATE INDEX idx_conteudos_autor ON conteudos(autor_id);
+CREATE INDEX idx_eventos_inicio ON eventos(status,data_inicio);
+CREATE INDEX idx_eventos_autor ON eventos(autor_id);
+CREATE INDEX idx_auditoria_usuario ON auditoria(usuario_id,criado_em DESC);
+
+CREATE OR REPLACE FUNCTION atualizar_timestamp() RETURNS TRIGGER AS $$
+BEGIN NEW.atualizado_em=NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER usuarios_atualizados BEFORE UPDATE ON usuarios FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp();
+CREATE TRIGGER categorias_atualizadas BEFORE UPDATE ON categorias FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp();
+CREATE TRIGGER conteudos_atualizados BEFORE UPDATE ON conteudos FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp();
+CREATE TRIGGER eventos_atualizados BEFORE UPDATE ON eventos FOR EACH ROW EXECUTE FUNCTION atualizar_timestamp();
