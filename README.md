@@ -1,28 +1,63 @@
-# Portal de Comunicação SI
+# Portal SI
 
-Portal acadêmico em PHP nativo, PostgreSQL e arquitetura Mini-MVC, estruturado conforme a Aula 06 de Projeto de Extensão IV.
+Projeto de comunicação do curso de Sistemas de Informação, desenvolvido em PHP nativo com PostgreSQL e arquitetura Mini-MVC.
 
-## Preparação
+## Organização da aplicação
 
-1. Crie o banco `portal_si` no PostgreSQL.
-2. Execute `database/schema.sql` e depois `database/seed.sql`.
-3. Configure `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASSWORD` no ambiente do Apache/PHP. Os valores padrão atendem ao banco local, exceto a senha, que permanece vazia por segurança.
-4. Configure o DocumentRoot do Apache para a pasta `public/`.
-5. Habilite `mod_rewrite` e acesse o endereço configurado.
+O fluxo principal segue esta ordem:
 
-No XAMPP, o VirtualHost deve apontar para `C:/xampp/htdocs/portal-si/public`, e não para a raiz do projeto. Caso use `http://localhost/portal-si/public/`, a aplicação também funciona para homologação local.
+```text
+Usuário envia e-mail e senha
+          ↓
+AuthController
+Recebe os campos e chama o serviço
+          ↓
+AuthService
+Solicita a busca do usuário
+          ↓
+Usuario (Model)
+Executa SELECT no PostgreSQL e retorna o usuário
+          ↓
+AuthService
+Confere a senha e se a conta pode entrar
+          ↓
+AuthController
+Estabelece a sessão com os helpers e redireciona
+          ↓
+Dashboard (View)
+Exibe o nome e o perfil do usuário
+```
 
-Usuário de homologação: `admin@portalsi.local` / `admin123`. Altere a senha antes de qualquer uso real.
+### Responsabilidades
 
-## Estrutura
+- **Controller:** recebe as requisições do navegador, chama os serviços e decide respostas e redirecionamentos.
+- **Service:** concentra as regras de negócio, como validação, autenticação e geração de hash.
+- **Model:** concentra as operações de dados e os comandos SQL parametrizados via PDO.
+- **View:** exibe formulários, mensagens e páginas HTML para o usuário.
+- **Helpers:** reúnem funções compartilhadas de segurança, sessão, validação e escape de HTML.
 
-- `app/Controllers`: fluxo HTTP e controle de acesso.
-- `app/Models`: consultas PDO parametrizadas e regras de persistência.
-- `app/Views`: interfaces públicas e administrativas.
-- `config`: configuração sem credenciais expostas no código.
-- `database`: DDL, índices, triggers e dados iniciais.
-- `public`: única pasta pública do servidor.
+Assim, uma alteração na consulta fica no Model, uma alteração na regra fica no Service e uma alteração na apresentação fica na View.
 
-## Segurança incluída
+## Estrutura inicial
 
-Senhas Bcrypt, sessões regeneradas no login, RBAC para admin/editor, token CSRF em formulários e saída HTML escapada contra XSS.
+```text
+portal-si/
+├── public/                 # Única pasta exposta pelo servidor web
+│   └── assets/             # CSS e imagens públicas
+├── app/
+│   ├── controllers/        # Orquestração das requisições
+│   ├── services/           # Regras de negócio
+│   ├── models/             # Acesso aos dados
+│   ├── helpers/            # Funções auxiliares e segurança
+│   └── views/              # Telas e templates
+├── config/                 # Configurações da aplicação
+├── database/               # Scripts schema.sql e seed.sql
+└── docs/                   # Documentação complementar
+```
+
+## Próximas etapas
+
+1. Executar `database/schema.sql` e `database/seed.sql` no PostgreSQL.
+2. Configurar o PHP/Apache e a extensão `pdo_pgsql`.
+3. Executar os testes da Aula 08 no navegador.
+4. Gerar o pacote final da equipe.
