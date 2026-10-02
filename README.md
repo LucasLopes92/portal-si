@@ -7,6 +7,10 @@ Projeto de comunicação do curso de Sistemas de Informação, desenvolvido em P
 O fluxo principal segue esta ordem:
 
 ```text
+Visitante abre /portal-si/ e vê a Home pública
+          ↓
+Seleciona "Fazer login"
+          ↓
 Usuário envia e-mail e senha
           ↓
 AuthController
@@ -24,8 +28,8 @@ Confere a senha e se a conta pode entrar
 AuthController
 Estabelece a sessão com os helpers e redireciona
           ↓
-Dashboard (View)
-Exibe o nome e o perfil do usuário
+Painel administrativo (View)
+Exibe o usuário e oferece acesso à Home pela logo ou pelo botão
 ```
 
 ### Responsabilidades
@@ -55,9 +59,29 @@ portal-si/
 └── docs/                   # Documentação complementar
 ```
 
-## Próximas etapas
+## Home pública (Aula 09)
 
-1. Executar `database/schema.sql` e `database/seed.sql` no PostgreSQL.
-2. Configurar o PHP/Apache e a extensão `pdo_pgsql`.
-3. Executar os testes da Aula 08 no navegador.
-4. Gerar o pacote final da equipe.
+A página inicial está em `public/index.php`. No XAMPP, abra
+`http://localhost/portal-si/`; o `index.php` da raiz redireciona para a Home.
+O menu consulta as categorias
+ativas do PostgreSQL e cada link filtra as publicações dessa categoria. A Home
+mostra até nove conteúdos publicados, em ordem de data, e um estado vazio
+quando ainda não há publicações. O cabeçalho e o rodapé ficam em
+`app/views/layout/`, incluídos pela view `app/views/home/index.php`.
+A Home é pública e mostra apenas as categorias acessíveis sem autenticação.
+O botão "Fazer login" leva ao formulário de acesso; o login bem-sucedido abre
+diretamente o painel administrativo. Na tela do painel, a logo ESUCRI e o botão
+"Ir para a Home" levam à Home mantendo a sessão ativa. Na Home, o botão
+"Painel" permite retornar ao painel.
+
+O CSS continua concentrado em `public/assets/css/style.css`, com adaptações
+em 1024px e 768px. Ao rolar a Home, a faixa institucional e a marca saem da
+área visível, enquanto o menu permanece fixo no topo em formato compacto.
+A interface pública usa PHP, HTML e CSS, sem JavaScript.
+
+As consultas usam os nomes de colunas do schema deste repositório: `ativo`
+em `categorias` e `autor_id` em `conteudos`. Alguns exemplos da apostila usam
+nomes diferentes. Para executar localmente, configure o PostgreSQL pela
+`config/database.php` ou pelas variáveis `PORTAL_DB_*` e aplique
+`database/schema.sql` e `database/seed.sql` se o banco ainda não estiver
+preparado.
