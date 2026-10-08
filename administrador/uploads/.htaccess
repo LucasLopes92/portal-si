@@ -1,0 +1,10 @@
+Options -Indexes
+
+<IfModule mod_mime.c>
+    RemoveHandler .php .php3 .php4 .php5 .phtml .phar
+    RemoveType .php .php3 .php4 .php5 .phtml .phar
+</IfModule>
+
+<FilesMatch "(?i)\.(php|php3|php4|php5|phtml|phar)$">
+    Require all denied
+</FilesMatch>
