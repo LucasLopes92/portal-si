@@ -1,0 +1,10 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Impede acesso HTTP direto aos diretórios internos do projeto quando a
+    # raiz do Apache estiver configurada na pasta portal-si.
+    RewriteRule ^(?:app|config|database|docs)(?:/|$) - [F,L]
+</IfModule>
