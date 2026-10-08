@@ -7,6 +7,10 @@
     <a class="admin-button admin-button--primary" href="<?= e(admin_url('conteudos_cadastrar.php')) ?>">+ Novo conteúdo</a>
 </section>
 
+<?php if ($flash !== null): ?>
+    <p class="admin-alert admin-alert--<?= e((string) $flash['tipo']) ?>" role="status"><?= e((string) $flash['mensagem']) ?></p>
+<?php endif; ?>
+
 <section class="admin-panel admin-panel--table" aria-label="Lista de conteúdos">
     <div class="admin-table-summary">
         <p><strong><?= (int) $paginacao['total'] ?></strong> conteúdo(s) encontrado(s)</p>

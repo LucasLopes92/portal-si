@@ -38,3 +38,24 @@ function admin_encerrar_sessao_atual(): void
 
     session_destroy();
 }
+
+function admin_definir_flash(string $tipo, string $mensagem): void
+{
+    iniciar_sessao_segura();
+    $_SESSION['admin_flash'] = ['tipo' => $tipo, 'mensagem' => $mensagem];
+}
+
+function admin_consumir_flash(): ?array
+{
+    iniciar_sessao_segura();
+    $flash = $_SESSION['admin_flash'] ?? null;
+    unset($_SESSION['admin_flash']);
+
+    return is_array($flash) ? $flash : null;
+}
+
+function admin_renovar_csrf(): void
+{
+    iniciar_sessao_segura();
+    unset($_SESSION['csrf_token']);
+}

@@ -13,6 +13,7 @@ $pagina = is_int($pagina) && $pagina > 0 ? $pagina : 1;
 
 $controller = new ConteudoAdminController(new ConteudoAdmin($pdo));
 $paginacao = $controller->listar($pagina);
+$flash = admin_consumir_flash();
 $tituloPagina = 'Conteúdos';
 $paginaAtual = 'conteudos';
 
