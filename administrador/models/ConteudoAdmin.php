@@ -58,12 +58,36 @@ final class ConteudoAdmin
         return (bool) $stmt->fetchColumn();
     }
 
-    public function slugExiste(string $slug): bool
+    public function slugExiste(string $slug, ?int $ignorarId = null): bool
     {
-        $stmt = $this->pdo->prepare('SELECT EXISTS (SELECT 1 FROM conteudos WHERE slug = :slug)');
-        $stmt->execute(['slug' => $slug]);
+        $sql = 'SELECT EXISTS (SELECT 1 FROM conteudos WHERE slug = :slug';
+        if ($ignorarId !== null) {
+            $sql .= ' AND id <> :ignorar_id';
+        }
+        $sql .= ')';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':slug', $slug);
+        if ($ignorarId !== null) {
+            $stmt->bindValue(':ignorar_id', $ignorarId, PDO::PARAM_INT);
+        }
+        $stmt->execute();
 
         return (bool) $stmt->fetchColumn();
+    }
+
+    public function buscarPorId(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT id, titulo, slug, resumo, corpo, link_youtube, categoria_id,
+                    autor_id, status, destaque, publicado_em, imagem_capa
+             FROM conteudos
+             WHERE id = :id'
+        );
+        $stmt->execute(['id' => $id]);
+        $conteudo = $stmt->fetch();
+
+        return $conteudo ?: null;
     }
 
     public function criar(array $dados): int
@@ -91,5 +115,35 @@ final class ConteudoAdmin
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
+    }
+
+    public function atualizar(int $id, array $dados): bool
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE conteudos
+             SET titulo = :titulo,
+                 slug = :slug,
+                 resumo = :resumo,
+                 corpo = :corpo,
+                 link_youtube = :link_youtube,
+                 categoria_id = :categoria_id,
+                 status = :status,
+                 destaque = :destaque,
+                 publicado_em = :publicado_em
+             WHERE id = :id'
+        );
+        $stmt->bindValue(':titulo', $dados['titulo']);
+        $stmt->bindValue(':slug', $dados['slug']);
+        $stmt->bindValue(':resumo', $dados['resumo']);
+        $stmt->bindValue(':corpo', $dados['corpo']);
+        $stmt->bindValue(':link_youtube', $dados['link_youtube']);
+        $stmt->bindValue(':categoria_id', $dados['categoria_id'], PDO::PARAM_INT);
+        $stmt->bindValue(':status', $dados['status']);
+        $stmt->bindValue(':destaque', $dados['destaque'], PDO::PARAM_BOOL);
+        $stmt->bindValue(':publicado_em', $dados['publicado_em']);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount() === 1;
     }
 }

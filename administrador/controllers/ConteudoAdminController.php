@@ -44,4 +44,18 @@ final class ConteudoAdminController
 
         return $this->service->criar($dados, $autorId);
     }
+
+    public function buscar(int $id): ?array
+    {
+        return $this->model->buscarPorId($id);
+    }
+
+    public function editar(int $id, array $dados): array
+    {
+        if ($this->service === null) {
+            $this->service = new ConteudoAdminService($this->model);
+        }
+
+        return $this->service->atualizar($id, $dados);
+    }
 }

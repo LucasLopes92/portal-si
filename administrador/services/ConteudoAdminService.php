@@ -43,6 +43,55 @@ final class ConteudoAdminService
         return ['sucesso' => true, 'id' => $id, 'erros' => [], 'dados' => $dados];
     }
 
+    public function atualizar(int $id, array $entrada): array
+    {
+        $atual = $this->model->buscarPorId($id);
+        if ($atual === null) {
+            return [
+                'sucesso' => false,
+                'nao_encontrado' => true,
+                'erros' => ['geral' => 'Conteúdo não encontrado.'],
+                'dados' => [],
+            ];
+        }
+
+        $validacao = $this->validar($entrada);
+        if ($validacao['erros'] !== []) {
+            return [
+                'sucesso' => false,
+                'nao_encontrado' => false,
+                'erros' => $validacao['erros'],
+                'dados' => $validacao['dados'],
+            ];
+        }
+
+        $dados = $validacao['dados'];
+        $dados['slug'] = $this->gerarSlugUnico($dados['titulo'], $id);
+        $dados['publicado_em'] = $dados['status'] === 'publicado'
+            ? ($atual['publicado_em'] ?: date(DATE_ATOM))
+            : null;
+
+        try {
+            $atualizado = $this->model->atualizar($id, $dados);
+        } catch (PDOException $exception) {
+            error_log('Falha ao atualizar conteúdo administrativo: ' . $exception->getMessage());
+
+            return [
+                'sucesso' => false,
+                'nao_encontrado' => false,
+                'erros' => ['geral' => 'Não foi possível atualizar o conteúdo.'],
+                'dados' => $dados,
+            ];
+        }
+
+        return [
+            'sucesso' => $atualizado,
+            'nao_encontrado' => false,
+            'erros' => $atualizado ? [] : ['geral' => 'Nenhuma alteração foi realizada.'],
+            'dados' => $dados,
+        ];
+    }
+
     private function validar(array $entrada): array
     {
         $titulo = trim((string) ($entrada['titulo'] ?? ''));
@@ -106,7 +155,7 @@ final class ConteudoAdminService
         return in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com', 'youtu.be'], true);
     }
 
-    private function gerarSlugUnico(string $titulo): string
+    private function gerarSlugUnico(string $titulo, ?int $ignorarId = null): string
     {
         $transliterado = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $titulo);
         $base = strtolower($transliterado !== false ? $transliterado : $titulo);
@@ -115,7 +164,7 @@ final class ConteudoAdminService
         $slug = $base;
         $sufixo = 2;
 
-        while ($this->model->slugExiste($slug)) {
+        while ($this->model->slugExiste($slug, $ignorarId)) {
             $final = '-' . $sufixo;
             $slug = mb_substr($base, 0, 220 - mb_strlen($final)) . $final;
             $sufixo++;
