@@ -92,6 +92,36 @@ final class ConteudoAdminService
         ];
     }
 
+    public function excluir(int $id): array
+    {
+        $conteudo = $this->model->buscarPorId($id);
+        if ($conteudo === null) {
+            return [
+                'sucesso' => false,
+                'nao_encontrado' => true,
+                'erro' => 'Conteúdo não encontrado.',
+            ];
+        }
+
+        try {
+            $excluido = $this->model->excluir($id);
+        } catch (PDOException $exception) {
+            error_log('Falha ao excluir conteúdo administrativo: ' . $exception->getMessage());
+
+            return [
+                'sucesso' => false,
+                'nao_encontrado' => false,
+                'erro' => 'Não foi possível excluir o conteúdo.',
+            ];
+        }
+
+        return [
+            'sucesso' => $excluido,
+            'nao_encontrado' => !$excluido,
+            'erro' => $excluido ? null : 'Conteúdo não encontrado.',
+        ];
+    }
+
     private function validar(array $entrada): array
     {
         $titulo = trim((string) ($entrada['titulo'] ?? ''));

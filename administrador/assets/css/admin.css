@@ -420,6 +420,16 @@ body {
     background: var(--admin-primary-dark);
 }
 
+.admin-button--danger {
+    color: #ffffff;
+    background: #9b1c28;
+}
+
+.admin-button--danger:hover,
+.admin-button--danger:focus-visible {
+    background: #75131d;
+}
+
 .admin-cards {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -816,6 +826,50 @@ body {
     display: flex;
     gap: 11px;
     padding-top: 5px;
+}
+
+.admin-confirmation {
+    max-width: 720px;
+    margin-top: 25px;
+    padding: 28px;
+    background: #ffffff;
+    border: 1px solid var(--admin-border);
+    border-top: 4px solid #9b1c28;
+    border-radius: 8px;
+}
+
+.admin-confirmation h2 {
+    margin: 0 0 10px;
+    font-size: 1.25rem;
+}
+
+.admin-confirmation p {
+    color: var(--admin-muted);
+}
+
+.admin-confirmation dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 8px 18px;
+    margin: 24px 0;
+    padding: 18px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.admin-confirmation dt {
+    color: var(--admin-muted);
+    font-weight: 700;
+}
+
+.admin-confirmation dd {
+    margin: 0;
+    font-weight: 800;
+}
+
+.admin-confirmation__warning {
+    color: #84202a !important;
+    font-weight: 800;
 }
 
 @media (max-width: 640px) {

@@ -58,4 +58,13 @@ final class ConteudoAdminController
 
         return $this->service->atualizar($id, $dados);
     }
+
+    public function excluir(int $id): array
+    {
+        if ($this->service === null) {
+            $this->service = new ConteudoAdminService($this->model);
+        }
+
+        return $this->service->excluir($id);
+    }
 }

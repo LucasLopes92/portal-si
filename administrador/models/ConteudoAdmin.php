@@ -146,4 +146,13 @@ final class ConteudoAdmin
 
         return $stmt->rowCount() === 1;
     }
+
+    public function excluir(int $id): bool
+    {
+        $stmt = $this->pdo->prepare('DELETE FROM conteudos WHERE id = :id');
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount() === 1;
+    }
 }
