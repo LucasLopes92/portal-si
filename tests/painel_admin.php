@@ -7,14 +7,14 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
-require_once __DIR__ . '/../includes/autenticacao.php';
-require_once __DIR__ . '/../models/UsuarioAdmin.php';
-require_once __DIR__ . '/../models/ConteudoAdmin.php';
-require_once __DIR__ . '/../models/PainelAdmin.php';
-require_once __DIR__ . '/../services/AutenticacaoAdminService.php';
-require_once __DIR__ . '/../services/ConteudoAdminService.php';
-require_once __DIR__ . '/../controllers/ConteudoAdminController.php';
-require_once __DIR__ . '/../../app/models/Conteudo.php';
+require_once __DIR__ . '/../app/helpers/admin.php';
+require_once __DIR__ . '/../app/models/ConteudoAdmin.php';
+require_once __DIR__ . '/../app/models/PainelAdmin.php';
+require_once __DIR__ . '/../app/services/ConteudoAdminService.php';
+require_once __DIR__ . '/../app/controllers/ConteudoAdminController.php';
+require_once __DIR__ . '/../app/models/Usuario.php';
+require_once __DIR__ . '/../app/services/AuthService.php';
+require_once __DIR__ . '/../app/models/Conteudo.php';
 
 /** @var array<int, string> $resultados */
 $resultados = [];
@@ -85,21 +85,20 @@ try {
     $senha = 'Teste-Painel-2026!';
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
     $stmtUsuario = $pdo->prepare(
-        "INSERT INTO usuarios (nome, email, senha, senha_hash, perfil, status)
-         VALUES (:nome, :email, :senha_legada, :senha_hash, 'admin', 'ativo')
+        "INSERT INTO usuarios (nome, email, senha_hash, perfil, status)
+         VALUES (:nome, :email, :senha_hash, 'admin', 'ativo')
          RETURNING id"
     );
     $stmtUsuario->execute([
         'nome' => 'Usuário Temporário do Painel',
         'email' => $email,
-        'senha_legada' => $senhaHash,
         'senha_hash' => $senhaHash,
     ]);
     $autorId = (int) $stmtUsuario->fetchColumn();
 
     teste_etapa('autenticação e autorização por perfil', function () use ($pdo, $email, $senha): void {
         iniciar_sessao_segura();
-        $service = new AutenticacaoAdminService(new UsuarioAdmin($pdo));
+        $service = new AuthService(new Usuario($pdo));
 
         $_SESSION = [];
         teste_garantir(!$service->autenticar($email, 'senha-incorreta'), 'Senha incorreta foi aceita.');
@@ -111,13 +110,14 @@ try {
         $stmt = $pdo->prepare("UPDATE usuarios SET perfil = 'editor' WHERE email = :email");
         $stmt->execute(['email' => $email]);
         $_SESSION = [];
-        teste_garantir($service->autenticar($email, $senha), 'Perfil editor não conseguiu autenticar.');
-        teste_garantir(admin_perfil_autorizado(), 'Perfil editor não recebeu autorização.');
+        teste_garantir($service->autenticar($email, $senha), 'Perfil editor não conseguiu autenticar no portal.');
+        teste_garantir(!admin_perfil_autorizado(), 'Perfil editor recebeu acesso administrativo.');
 
         $stmt = $pdo->prepare("UPDATE usuarios SET perfil = 'aluno' WHERE email = :email");
         $stmt->execute(['email' => $email]);
         $_SESSION = [];
-        teste_garantir(!$service->autenticar($email, $senha), 'Perfil aluno recebeu acesso administrativo.');
+        teste_garantir($service->autenticar($email, $senha), 'Perfil aluno não conseguiu autenticar no portal.');
+        teste_garantir(!admin_perfil_autorizado(), 'Perfil aluno recebeu acesso administrativo.');
 
         $stmt = $pdo->prepare("UPDATE usuarios SET perfil = 'admin' WHERE email = :email");
         $stmt->execute(['email' => $email]);
@@ -199,7 +199,7 @@ try {
 
         $_GET = [];
         ob_start();
-        require __DIR__ . '/../../public/index.php';
+        require __DIR__ . '/../public/index.php';
         $html = (string) ob_get_clean();
         teste_garantir(str_contains($html, e($tituloCriado)), 'Conteúdo publicado não apareceu no HTML da Home.');
     });
@@ -259,14 +259,14 @@ try {
             'conteudos_editar.php',
             'conteudos_excluir.php',
         ] as $arquivo) {
-            $codigo = (string) file_get_contents(__DIR__ . '/../' . $arquivo);
+            $codigo = (string) file_get_contents(__DIR__ . '/../administrador/' . $arquivo);
             teste_garantir(
                 str_contains($codigo, 'admin_exigir_acesso();'),
                 "Rota sem verificação administrativa: {$arquivo}."
             );
         }
 
-        $codigoExclusao = (string) file_get_contents(__DIR__ . '/../conteudos_excluir.php');
+        $codigoExclusao = (string) file_get_contents(__DIR__ . '/../administrador/conteudos_excluir.php');
         teste_garantir(str_contains($codigoExclusao, "REQUEST_METHOD'] === 'POST'"), 'Exclusão não exige POST.');
         teste_garantir(str_contains($codigoExclusao, 'validar_token_csrf'), 'Exclusão não valida o token CSRF.');
     });

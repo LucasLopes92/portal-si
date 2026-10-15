@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/includes/autenticacao.php';
-require_once __DIR__ . '/models/PainelAdmin.php';
-require_once __DIR__ . '/controllers/PainelAdminController.php';
+require_once __DIR__ . '/../app/helpers/admin.php';
+require_once __DIR__ . '/../app/models/PainelAdmin.php';
+require_once __DIR__ . '/../app/controllers/PainelAdminController.php';
 
 admin_exigir_acesso();
 
@@ -13,6 +13,6 @@ $resumo = $controller->resumo();
 $tituloPagina = 'Visão geral';
 $paginaAtual = 'dashboard';
 
-require __DIR__ . '/includes/header.php';
-require __DIR__ . '/views/dashboard.php';
-require __DIR__ . '/includes/footer.php';
+require __DIR__ . '/../app/views/admin/painel/layout/header.php';
+require __DIR__ . '/../app/views/admin/painel/dashboard.php';
+require __DIR__ . '/../app/views/admin/painel/layout/footer.php';

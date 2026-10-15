@@ -2,7 +2,8 @@
 // O ponto de entrada fornece $titulo_pagina e $categorias_menu.
 $url_home = app_base_url() . '/public/index.php';
 $url_login = app_base_url() . '/app/views/admin/login.php';
-$url_painel = app_base_url() . '/app/views/admin/dashboard.php';
+$usuario_admin = (string) ($_SESSION['usuario_perfil'] ?? '') === 'admin';
+$url_painel = app_base_url() . '/administrador/';
 $url_sair = app_base_url() . '/app/views/admin/logout.php';
 $mostrar_aviso_logout = ($_GET['msg'] ?? null) === 'desconectado' && !isset($_SESSION['usuario_id']);
 $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/assets/css/style.css'), 0, 12);
@@ -53,7 +54,9 @@ $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/a
                 </details>
                 <div class="portal-nav__account">
                     <?php if (isset($_SESSION['usuario_id'])): ?>
-                        <a class="portal-nav__account-action" href="<?= e($url_painel) ?>">Painel</a>
+                        <?php if ($usuario_admin): ?>
+                            <a class="portal-nav__account-action" href="<?= e($url_painel) ?>">Painel administrativo</a>
+                        <?php endif; ?>
                         <a class="portal-nav__account-action portal-nav__account-action--secondary" href="<?= e($url_sair) ?>">Sair</a>
                     <?php else: ?>
                         <a class="portal-nav__account-action" href="<?= e($url_login) ?>">Fazer login</a>

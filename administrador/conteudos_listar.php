@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/includes/autenticacao.php';
-require_once __DIR__ . '/models/ConteudoAdmin.php';
-require_once __DIR__ . '/controllers/ConteudoAdminController.php';
+require_once __DIR__ . '/../app/helpers/admin.php';
+require_once __DIR__ . '/../app/models/ConteudoAdmin.php';
+require_once __DIR__ . '/../app/controllers/ConteudoAdminController.php';
 
 admin_exigir_acesso();
 
@@ -17,6 +17,6 @@ $flash = admin_consumir_flash();
 $tituloPagina = 'Conteúdos';
 $paginaAtual = 'conteudos';
 
-require __DIR__ . '/includes/header.php';
-require __DIR__ . '/views/conteudos/listar.php';
-require __DIR__ . '/includes/footer.php';
+require __DIR__ . '/../app/views/admin/painel/layout/header.php';
+require __DIR__ . '/../app/views/admin/painel/conteudos/listar.php';
+require __DIR__ . '/../app/views/admin/painel/layout/footer.php';

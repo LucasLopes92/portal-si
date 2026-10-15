@@ -2,10 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/includes/bootstrap.php';
-require_once __DIR__ . '/models/UsuarioAdmin.php';
-require_once __DIR__ . '/services/AutenticacaoAdminService.php';
-require_once __DIR__ . '/controllers/AutenticacaoAdminController.php';
+require_once __DIR__ . '/../app/helpers/admin.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Allow: POST');
@@ -18,10 +15,7 @@ if (!validar_token_csrf($_POST['csrf_token'] ?? null)) {
     exit('Token de segurança inválido.');
 }
 
-$controller = new AutenticacaoAdminController(
-    new AutenticacaoAdminService(new UsuarioAdmin($pdo))
-);
-$controller->logout();
+admin_encerrar_sessao_atual();
 
-header('Location: ' . admin_url('login.php?msg=desconectado'));
+header('Location: ' . app_base_url() . '/public/index.php?msg=desconectado');
 exit;

@@ -7,7 +7,7 @@ Data da consolidação: 8 de outubro de 2026.
 Execute a partir da raiz do projeto:
 
 ```powershell
-C:\xampp\php\php.exe administrador\tests\executar.php
+C:\xampp\php\php.exe tests\painel_admin.php
 ```
 
 O teste termina com código `0` somente quando todos os casos passam. Os registros temporários são protegidos por transação e removidos com `rollback`, inclusive quando alguma etapa falha.
@@ -16,7 +16,7 @@ Casos verificados:
 
 1. presença das tabelas e colunas obrigatórias;
 2. rejeição de senha incorreta;
-3. acesso permitido para `admin` e `editor` e negado para `aluno`;
+3. autenticação no portal e acesso administrativo exclusivo para `admin`;
 4. geração e validação do token CSRF;
 5. escape de HTML informado pelo usuário;
 6. rejeição dos campos inválidos do cadastro;
@@ -31,7 +31,7 @@ Casos verificados:
 
 ## Conferência manual no navegador
 
-1. Entre em `administrador/login.php` com uma conta `admin` ou `editor`.
+1. Entre em `app/views/admin/login.php` com a conta de perfil `admin`.
 2. Confira os cartões da visão geral.
 3. Abra **Conteúdos** e confirme a tabela e a paginação.
 4. Cadastre um rascunho e confirme que ele não aparece na Home.

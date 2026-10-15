@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $tituloPagina = $tituloPagina ?? 'Painel administrativo';
 $paginaAtual = $paginaAtual ?? '';
-$cssAdmin = __DIR__ . '/../assets/css/admin.css';
+$cssAdmin = __DIR__ . '/../../../../../public/assets/css/admin.css';
 $cssVersao = is_file($cssAdmin)
     ? substr((string) hash_file('sha256', $cssAdmin), 0, 12)
     : '1';
@@ -15,7 +15,7 @@ $cssVersao = is_file($cssAdmin)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($tituloPagina) ?> | Administração Portal SI</title>
-    <link rel="stylesheet" href="<?= e(admin_url('assets/css/admin.css?v=' . $cssVersao)) ?>">
+    <link rel="stylesheet" href="<?= e(app_base_url() . '/public/assets/css/admin.css?v=' . $cssVersao) ?>">
 </head>
 <body class="admin-shell">
     <a class="admin-skip-link" href="#conteudo-admin">Ir para o conteúdo</a>

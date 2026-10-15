@@ -1,13 +1,6 @@
 Options -Indexes
 DirectoryIndex index.php
 
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # Os componentes internos são carregados apenas pelo PHP.
-    RewriteRule ^(?:controllers|database|includes|models|services|views)(?:/|$) - [F,L,NC]
-</IfModule>
-
 <FilesMatch "(?i)^\.">
     Require all denied
 </FilesMatch>

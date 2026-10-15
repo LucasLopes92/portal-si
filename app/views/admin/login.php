@@ -10,6 +10,18 @@ require_once __DIR__ . '/../../controllers/AuthController.php';
 require_once __DIR__ . '/../../helpers/seguranca.php';
 
 iniciar_sessao_segura();
+
+// A autenticação é centralizada nesta tela. Se a conta administrativa já
+// estiver autenticada, não faz sentido exibir o formulário novamente.
+if (
+    isset($_SESSION['usuario_id'])
+    && (int) $_SESSION['usuario_id'] > 0
+    && (string) ($_SESSION['usuario_perfil'] ?? '') === 'admin'
+) {
+    header('Location: ' . app_base_url() . '/administrador/');
+    exit;
+}
+
 $controller = new AuthController(new AuthService(new Usuario($pdo)));
 $mensagem = null;
 if (isset($_GET['msg']) && $_GET['msg'] === 'sucesso_cadastro') {
@@ -21,13 +33,19 @@ if (isset($_GET['msg']) && $_GET['msg'] === 'desconectado') {
 if (isset($_GET['erro']) && $_GET['erro'] === 'expirado') {
     $mensagem = 'Sua sessão expirou por inatividade.';
 }
+if (isset($_GET['erro']) && $_GET['erro'] === 'restrito_admin') {
+    $mensagem = 'Entre com a conta administradora para acessar o painel.';
+}
 
 $erroLogin = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!validar_token_csrf($_POST['csrf_token'] ?? null)) {
         $erroLogin = 'A sessão do formulário expirou. Tente novamente.';
     } elseif ($controller->login($_POST)) {
-        header('Location: dashboard.php');
+        $destino = (string) ($_SESSION['usuario_perfil'] ?? '') === 'admin'
+            ? app_base_url() . '/administrador/'
+            : app_base_url() . '/public/index.php';
+        header('Location: ' . $destino);
         exit;
     } else {
         $erroLogin = 'E-mail ou senha inválidos.';

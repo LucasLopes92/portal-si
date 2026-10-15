@@ -26,10 +26,10 @@ AuthService
 Confere a senha e se a conta pode entrar
           ↓
 AuthController
-Estabelece a sessão com os helpers e redireciona
+Estabelece a sessão com os helpers e redireciona conforme o perfil
           ↓
-Painel administrativo (View)
-Exibe o usuário e oferece acesso à Home pela logo ou pelo botão
+Conta admin: painel administrativo completo
+Outras contas: Home autenticada, sem acesso administrativo
 ```
 
 ### Responsabilidades
@@ -69,8 +69,9 @@ mostra até nove conteúdos publicados, em ordem de data, e um estado vazio
 quando ainda não há publicações. O cabeçalho e o rodapé ficam em
 `app/views/layout/`, incluídos pela view `app/views/home/index.php`.
 A Home é pública e mostra apenas as categorias acessíveis sem autenticação.
-O botão "Fazer login" leva ao formulário de acesso; o login bem-sucedido abre
-diretamente o painel administrativo. Na tela do painel, a logo ESUCRI e o botão
+O botão "Fazer login" leva ao formulário de acesso. Uma conta com perfil
+`admin` abre diretamente o painel administrativo completo; os demais perfis
+retornam à Home sem acesso às rotas administrativas. Na tela do painel, a logo ESUCRI e o botão
 "Ir para a Home" levam à Home mantendo a sessão ativa. Na Home, o botão
 "Painel" permite retornar ao painel.
 
@@ -85,3 +86,16 @@ nomes diferentes. Para executar localmente, configure o PostgreSQL pela
 `config/database.php` ou pelas variáveis `PORTAL_DB_*` e aplique
 `database/schema.sql` e `database/seed.sql` se o banco ainda não estiver
 preparado.
+
+## Painel administrativo
+
+O painel utiliza a mesma autenticação do portal e permite acesso somente ao
+perfil `admin`. Os pontos de entrada HTTP ficam em `administrador/`; a lógica
+segue a estrutura MVC existente em `app/`.
+
+Para validar o banco e o fluxo administrativo:
+
+```powershell
+C:\xampp\php\php.exe database\verificar_banco.php
+C:\xampp\php\php.exe tests\painel_admin.php
+```
