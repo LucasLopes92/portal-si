@@ -76,9 +76,17 @@ foreach (['usuarios', 'categorias', 'conteudos'] as $tabela) {
     }
 }
 
+$conexao = $pdo->query(
+    'SELECT current_user AS usuario, inet_server_addr()::text AS servidor,
+            inet_server_port() AS porta,
+            (SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid()) AS ssl,
+            version() AS versao'
+)->fetch();
+
 echo json_encode(
     [
         'banco' => (string) $pdo->query('SELECT current_database()')->fetchColumn(),
+        'conexao' => $conexao,
         'valido' => $problemas === [],
         'problemas' => $problemas,
         'tabelas' => $tabelasEncontradas,

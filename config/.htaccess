@@ -1,0 +1,2 @@
+# Configuracoes sao carregadas pelo PHP, nunca por uma requisicao HTTP.
+Require all denied

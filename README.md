@@ -99,3 +99,8 @@ Para validar o banco e o fluxo administrativo:
 C:\xampp\php\php.exe database\verificar_banco.php
 C:\xampp\php\php.exe tests\painel_admin.php
 ```
+
+## Banco remoto
+
+A conexao suporta PostgreSQL no Aiven com SSL e credenciais privadas, usando
+o mesmo arquivo no Apache e no PHP CLI. Veja [configuracao do Aiven](docs/AIVEN.md).
