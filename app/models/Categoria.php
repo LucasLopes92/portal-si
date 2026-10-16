@@ -15,6 +15,7 @@ final class Categoria
             'SELECT id, nome, slug, descricao, icone
              FROM categorias
              WHERE ativo = TRUE
+               AND slug IN (\'noticias\', \'eventos\')
              ORDER BY ordem ASC, id ASC'
         );
         $stmt->execute();

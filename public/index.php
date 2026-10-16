@@ -29,12 +29,36 @@ if ($slug_categoria !== null) {
     }
 }
 
-$conteudos_recentes = $categoria_atual !== null || $slug_categoria === null
-    ? (new Conteudo($pdo))->listarPublicados(9, $categoria_atual === null ? null : (int) $categoria_atual['id'])
-    : [];
+$todas_publicacoes = ($_GET['publicacoes'] ?? null) === 'todas';
+$palavra_busca = isset($_GET['busca']) && is_string($_GET['busca']) ? mb_substr(trim($_GET['busca']), 0, 200) : '';
+$data_busca = isset($_GET['data']) && is_string($_GET['data']) ? trim($_GET['data']) : '';
+$busca_ativa = $palavra_busca !== '' || $data_busca !== '';
+$listagem_publica = $categoria_atual !== null || $todas_publicacoes || $busca_ativa;
+$erro_busca = '';
+if ($data_busca !== '') {
+    $data_validada = preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/D', $data_busca)
+        ? DateTimeImmutable::createFromFormat('!Y-m-d', $data_busca, new DateTimeZone('America/Sao_Paulo'))
+        : false;
+    if ($data_validada === false || $data_validada->format('Y-m-d') !== $data_busca) {
+        $erro_busca = 'Informe uma data de publicação válida.';
+    }
+}
+$filtros_busca = ['palavra' => $palavra_busca, 'data' => $data_busca];
+$conteudos_recentes = [];
+$total_publicacoes = 0;
+if (($categoria_atual !== null || $slug_categoria === null) && $erro_busca === '') {
+    $model_conteudo = new Conteudo($pdo);
+    $categoria_id = $categoria_atual === null ? null : (int) $categoria_atual['id'];
+    $conteudos_recentes = $model_conteudo->listarPublicados(null, $categoria_id, 0, $filtros_busca);
+    $total_publicacoes = count($conteudos_recentes);
+}
+
+$contexto_busca = $categoria_atual !== null
+    ? ['categoria' => $categoria_atual['slug']]
+    : ($todas_publicacoes ? ['publicacoes' => 'todas'] : []);
 
 $titulo_pagina = $slug_categoria !== null && $categoria_atual === null
     ? 'Categoria não encontrada'
-    : ($categoria_atual === null ? 'Página inicial' : $categoria_atual['nome']);
+    : ($categoria_atual['nome'] ?? ($todas_publicacoes ? 'Todas as publicações' : 'Página inicial'));
 
 require_once __DIR__ . '/../app/views/home/index.php';
