@@ -16,7 +16,7 @@ $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/a
     <title><?= e($titulo_pagina ?? 'Portal SI') ?> | Portal SI - ESUCRI</title>
     <link rel="stylesheet" href="<?= e(app_base_url()) ?>/public/assets/css/style.css?v=<?= e($css_version) ?>">
 </head>
-<body class="portal-page">
+<body class="portal-page<?= $categoria_atual !== null ? ' portal-page--' . e($categoria_atual['slug']) : '' ?>">
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
     <?php if ($mostrar_aviso_logout): ?>
         <div class="portal-logout-notice" role="status">Logout realizado com sucesso.</div>
@@ -30,13 +30,13 @@ $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/a
             </a>
             <?php if (isset($_SESSION['usuario_id'])): ?>
                 <div class="portal-header__identity portal-header__identity--signed-in">Olá, <strong><?= e((string) ($_SESSION['usuario_nome'] ?? '')) ?></strong></div>
-            <?php else: ?>
+            <?php elseif (!$listagem_publica): ?>
                 <div class="portal-header__identity">Um espaço para conectar ideias, pessoas e oportunidades.</div>
             <?php endif; ?>
         </div>
         <nav class="portal-nav" aria-label="Navegação principal">
             <div class="portal-nav__inner">
-                <a class="portal-nav__home<?= $slug_categoria === null ? ' is-current' : '' ?>" href="<?= e($url_home) ?>"<?= $slug_categoria === null ? ' aria-current="page"' : '' ?>>Início</a>
+                <a class="portal-nav__home<?= $slug_categoria === null && !$todas_publicacoes ? ' is-current' : '' ?>" href="<?= e($url_home) ?>"<?= $slug_categoria === null && !$todas_publicacoes ? ' aria-current="page"' : '' ?>>Início</a>
                 <ul class="portal-nav__list portal-nav__list--desktop">
                     <?php foreach ($categorias_menu as $categoria): ?>
                         <?php $ativa = $categoria_atual !== null && $categoria_atual['id'] === $categoria['id']; ?>

@@ -65,7 +65,7 @@ A página inicial está em `public/index.php`. No XAMPP, abra
 `http://localhost/portal-si/`; o `index.php` da raiz redireciona para a Home.
 O menu consulta as categorias
 ativas do PostgreSQL e cada link filtra as publicações dessa categoria. A Home
-mostra até nove conteúdos publicados, em ordem de data, e um estado vazio
+mostra os conteúdos publicados, do mais recente para o mais antigo, e um estado vazio
 quando ainda não há publicações. O cabeçalho e o rodapé ficam em
 `app/views/layout/`, incluídos pela view `app/views/home/index.php`.
 A Home é pública e mostra apenas as categorias acessíveis sem autenticação.
@@ -101,6 +101,19 @@ C:\xampp\php\php.exe tests\painel_admin.php
 ```
 
 ## Banco remoto
+
+O menu público exibe, por enquanto, apenas **Notícias** e **Eventos**. Cada aba
+tem sua apresentação e consulta as publicações cadastradas no painel
+administrativo, exibindo título, resumo, categoria, autor e data do banco.
+Somente conteúdos com status `publicado` e data de publicação preenchida
+aparecem no portal. As alterações feitas pelo painel são refletidas ao
+recarregar a página.
+
+As publicações são listadas integralmente em fileiras de três no desktop,
+da mais recente para a mais antiga. O botão **Buscar** abre um formulário
+recolhível abaixo do cabeçalho, com palavra-chave e data de publicação.
+Os filtros podem ser combinados e permanecem na URL; **Limpar** restaura a
+lista completa da categoria. A data considera o fuso de São Paulo.
 
 A conexao suporta PostgreSQL no Aiven com SSL e credenciais privadas, usando
 o mesmo arquivo no Apache e no PHP CLI. Veja [configuracao do Aiven](docs/AIVEN.md).

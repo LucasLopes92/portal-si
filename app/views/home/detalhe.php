@@ -13,6 +13,8 @@
         <?php
         $imagem_detalhe = imagem_publica_src($conteudo_detalhe['imagem_capa'] ?? null);
         $youtube_detalhe = youtube_embed_url($conteudo_detalhe['link_youtube'] ?? null);
+        $data_detalhe = (new DateTimeImmutable($conteudo_detalhe['publicado_em']))
+            ->setTimezone(new DateTimeZone('America/Sao_Paulo'));
         ?>
         <a class="portal-text-link portal-article__back" href="<?= e($url_home . '?categoria=' . rawurlencode($conteudo_detalhe['categoria_slug'])) ?>">← Voltar para <?= e($conteudo_detalhe['categoria_nome']) ?></a>
         <header class="portal-article__header">
@@ -20,7 +22,7 @@
             <h1 id="titulo-conteudo"><?= e($conteudo_detalhe['titulo']) ?></h1>
             <p class="portal-article__meta">Por <?= e($conteudo_detalhe['autor_nome']) ?>
                 <span aria-hidden="true">·</span>
-                <time datetime="<?= e(date('Y-m-d', strtotime($conteudo_detalhe['publicado_em']))) ?>"><?= e(date('d/m/Y', strtotime($conteudo_detalhe['publicado_em']))) ?></time>
+                <time datetime="<?= e($data_detalhe->format('Y-m-d')) ?>"><?= e($data_detalhe->format('d/m/Y')) ?></time>
             </p>
         </header>
 

@@ -20,6 +20,7 @@ final class Categoria
               AND c.status = :status
               AND c.publicado_em IS NOT NULL
              WHERE cat.ativo = TRUE
+               AND cat.slug IN (\'noticias\', \'eventos\')
              GROUP BY cat.id, cat.nome, cat.slug, cat.descricao, cat.icone, cat.ordem
              ORDER BY cat.ordem ASC, cat.id ASC'
         );

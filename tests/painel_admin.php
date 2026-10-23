@@ -192,6 +192,52 @@ try {
         teste_garantir($paginacao['total'] >= 1, 'Total da paginação está incorreto.');
     });
 
+    teste_etapa('listagem pública completa e ordenada', function () use ($pdo, $categoriaId, $autorId, $sufixo): void {
+        $model = new Conteudo($pdo);
+        $antes = $model->contarPublicados($categoriaId);
+        $pdo->exec('SAVEPOINT teste_lista_completa');
+        try {
+            $stmt = $pdo->prepare(
+                "INSERT INTO conteudos (titulo, slug, corpo, categoria_id, autor_id, status, publicado_em)
+                 SELECT 'Publicação temporária', :prefixo || n, 'Texto temporário', :categoria, :autor,
+                        'publicado', CURRENT_TIMESTAMP - n * INTERVAL '1 hour'
+                 FROM generate_series(1, 10) AS n"
+            );
+            $stmt->execute(['prefixo' => 'teste-lista-' . $sufixo . '-', 'categoria' => $categoriaId, 'autor' => $autorId]);
+            $todos = $model->listarPublicados(null, $categoriaId);
+            teste_garantir(count($todos) === $antes + 10, 'A listagem completa foi truncada.');
+            $datas = array_map(static fn(array $item): int => strtotime($item['publicado_em']), $todos);
+            $ordenadas = $datas;
+            rsort($ordenadas);
+            teste_garantir($datas === $ordenadas, 'Publicações fora da ordem mais recente primeiro.');
+        } finally {
+            $pdo->exec('ROLLBACK TO SAVEPOINT teste_lista_completa');
+            $pdo->exec('RELEASE SAVEPOINT teste_lista_completa');
+        }
+    });
+
+    teste_etapa('busca por palavra, data e filtros combinados', function () use ($pdo, $categoriaId, $conteudoId, $sufixo, $tituloCriado): void {
+        $model = new Conteudo($pdo);
+        $pdo->exec('SAVEPOINT teste_busca_publica');
+        try {
+            $stmt = $pdo->prepare('UPDATE conteudos SET publicado_em = :data, corpo = :corpo WHERE id = :id');
+            $literal = 'Marcador-' . $sufixo . '%_!';
+            $stmt->execute(['data' => '2026-10-16 02:30:00+00', 'corpo' => $literal, 'id' => $conteudoId]);
+            $itens = $model->listarPublicados(null, $categoriaId, 0, ['palavra' => mb_strtoupper($tituloCriado)]);
+            teste_garantir(array_column($itens, 'id') === [$conteudoId], 'Busca não encontrou o título sem distinguir maiúsculas.');
+            $itens = $model->listarPublicados(null, $categoriaId, 0, ['palavra' => $literal, 'data' => '2026-10-15']);
+            teste_garantir(
+                array_column($itens, 'id') === [$conteudoId],
+                'Busca combinada falhou ao tratar símbolos literais ou a data no fuso de São Paulo.'
+            );
+            teste_garantir($model->listarPublicados(null, $categoriaId, 0, ['palavra' => $literal, 'data' => '2026-10-16']) === [], 'Data usou o dia UTC em vez do dia local.');
+            teste_garantir($model->listarPublicados(null, $categoriaId, 0, ['palavra' => 'inexistente-' . $sufixo]) === [], 'Busca sem correspondência retornou publicações.');
+        } finally {
+            $pdo->exec('ROLLBACK TO SAVEPOINT teste_busca_publica');
+            $pdo->exec('RELEASE SAVEPOINT teste_busca_publica');
+        }
+    });
+
     teste_etapa('integração com a Home pública', function () use ($pdo, $conteudoId, $tituloCriado): void {
         $publicados = (new Conteudo($pdo))->listarPublicados(1000);
         $ids = array_map(static fn (array $item): int => (int) $item['id'], $publicados);
