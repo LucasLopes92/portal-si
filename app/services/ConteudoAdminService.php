@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../models/ConteudoAdmin.php';
+require_once __DIR__ . '/../helpers/publico.php';
 
 final class ConteudoAdminService
 {
@@ -129,6 +130,7 @@ final class ConteudoAdminService
         $resumo = trim((string) ($entrada['resumo'] ?? ''));
         $corpo = trim((string) ($entrada['corpo'] ?? ''));
         $linkYoutube = trim((string) ($entrada['link_youtube'] ?? ''));
+        $imagemCapa = trim((string) ($entrada['imagem_capa'] ?? ''));
         $status = (string) ($entrada['status'] ?? 'rascunho');
         $destaque = isset($entrada['destaque']) && (string) $entrada['destaque'] === '1';
         $erros = [];
@@ -155,6 +157,10 @@ final class ConteudoAdminService
             $erros['link_youtube'] = 'Informe uma URL válida do YouTube ou deixe o campo vazio.';
         }
 
+        if (mb_strlen($imagemCapa) > 255 || ($imagemCapa !== '' && imagem_publica_src($imagemCapa) === null)) {
+            $erros['imagem_capa'] = 'Informe uma URL HTTPS ou um caminho relativo vÃ¡lido para a imagem (atÃ© 255 caracteres).';
+        }
+
         if (!in_array($status, self::STATUS_PERMITIDOS, true)) {
             $erros['status'] = 'Selecione um status válido.';
             $status = 'rascunho';
@@ -168,6 +174,7 @@ final class ConteudoAdminService
                 'resumo' => $resumo === '' ? null : $resumo,
                 'corpo' => $corpo,
                 'link_youtube' => $linkYoutube === '' ? null : $linkYoutube,
+                'imagem_capa' => $imagemCapa === '' ? null : $imagemCapa,
                 'status' => $status,
                 'destaque' => $destaque,
             ],

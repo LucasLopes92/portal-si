@@ -42,9 +42,15 @@
         <div class="grade-publicacoes">
             <?php foreach ($conteudos_recentes as $item): ?>
                 <article class="cartao-conteudo">
+                    <?php $imagem_capa = imagem_publica_src($item['imagem_capa'] ?? null); ?>
+                    <?php if ($imagem_capa !== null): ?>
+                        <a class="cartao-imagem-link" href="<?= e($url_home . '?conteudo=' . (int) $item['id']) ?>">
+                            <img class="cartao-imagem" src="<?= e($imagem_capa) ?>" alt="<?= e($item['titulo']) ?>" loading="lazy">
+                        </a>
+                    <?php endif; ?>
                     <header class="cartao-cabecalho">
                         <a class="cartao-categoria" href="<?= e($url_home . '?categoria=' . rawurlencode($item['categoria_slug'])) ?>"><?= e($item['categoria_nome']) ?></a>
-                        <h3 class="cartao-titulo"><?= e($item['titulo']) ?></h3>
+                        <h3 class="cartao-titulo"><a href="<?= e($url_home . '?conteudo=' . (int) $item['id']) ?>"><?= e($item['titulo']) ?></a></h3>
                     </header>
                     <p class="cartao-resumo"><?= e($item['resumo'] ?: mb_strimwidth(strip_tags($item['corpo']), 0, 160, '…', 'UTF-8')) ?></p>
                     <footer class="cartao-rodape">
@@ -54,6 +60,32 @@
                 </article>
             <?php endforeach; ?>
         </div>
+    <?php endif; ?>
+
+    <?php if ($categoria_atual !== null && $total_paginas > 1): ?>
+        <nav class="portal-pagination" aria-label="Paginação das publicações">
+            <?php if ($pagina_atual > 1): ?>
+                <a href="<?= e($url_home . '?categoria=' . rawurlencode($categoria_atual['slug']) . '&pagina=' . ($pagina_atual - 1)) ?>" rel="prev">Anterior</a>
+            <?php endif; ?>
+            <span>Página <?= (int) $pagina_atual ?> de <?= (int) $total_paginas ?></span>
+            <?php if ($pagina_atual < $total_paginas): ?>
+                <a href="<?= e($url_home . '?categoria=' . rawurlencode($categoria_atual['slug']) . '&pagina=' . ($pagina_atual + 1)) ?>" rel="next">Próxima</a>
+            <?php endif; ?>
+        </nav>
+    <?php endif; ?>
+
+    <?php if ($categoria_atual === null && $slug_categoria === null && $categorias_menu !== []): ?>
+        <section class="portal-category-counts" aria-labelledby="titulo-categorias-publicacoes">
+            <h2 id="titulo-categorias-publicacoes">Navegue por categoria</h2>
+            <div class="portal-category-counts__list">
+                <?php foreach ($categorias_menu as $categoria): ?>
+                    <a class="portal-category-chip" href="<?= e($url_home . '?categoria=' . rawurlencode($categoria['slug'])) ?>">
+                        <span><?= e($categoria['nome']) ?></span>
+                        <span class="portal-category-chip__count"><?= (int) $categoria['total_publicados'] ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </section>
     <?php endif; ?>
 </section>
 

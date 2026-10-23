@@ -55,6 +55,12 @@
     </div>
 
     <div class="admin-form-field admin-form-field--wide">
+        <label for="imagem_capa">Imagem de capa</label>
+        <input id="imagem_capa" name="imagem_capa" type="text" maxlength="255" placeholder="https://... ou public/assets/imagens/capa.jpg" value="<?= e((string) ($dados['imagem_capa'] ?? '')) ?>">
+        <small>Informe uma URL HTTPS ou um caminho relativo dentro da pasta pública. O campo é opcional.</small>
+    </div>
+
+    <div class="admin-form-field admin-form-field--wide">
         <label for="link_youtube">Link do YouTube</label>
         <input id="link_youtube" name="link_youtube" type="url" placeholder="https://www.youtube.com/watch?v=..." value="<?= e((string) ($dados['link_youtube'] ?? '')) ?>">
     </div>

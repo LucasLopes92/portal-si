@@ -18,6 +18,7 @@ $dados = [
     'categoria_id' => 0,
     'resumo' => '',
     'corpo' => '',
+    'imagem_capa' => '',
     'link_youtube' => '',
     'status' => 'rascunho',
     'destaque' => false,
@@ -44,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $tituloPagina = 'Novo conteúdo';
 $paginaAtual = 'conteudos';
 $tituloFormulario = 'Publicar novo conteúdo';
-$descricaoFormulario = 'Preencha as informações editoriais. A imagem de capa será adicionada em uma etapa posterior.';
+$descricaoFormulario = 'Preencha as informações editoriais da publicação.';
 $acaoFormulario = admin_url('conteudos_cadastrar.php');
 $rotuloBotao = 'Salvar conteúdo';
 $statusDisponiveis = ['rascunho' => 'Rascunho', 'publicado' => 'Publicado'];

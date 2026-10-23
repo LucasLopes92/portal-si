@@ -33,6 +33,7 @@ $dados = [
     'categoria_id' => (int) $conteudo['categoria_id'],
     'resumo' => $conteudo['resumo'] ?? '',
     'corpo' => $conteudo['corpo'],
+    'imagem_capa' => $conteudo['imagem_capa'] ?? '',
     'link_youtube' => $conteudo['link_youtube'] ?? '',
     'status' => $conteudo['status'],
     'destaque' => (bool) $conteudo['destaque'],

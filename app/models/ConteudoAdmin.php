@@ -94,10 +94,10 @@ final class ConteudoAdmin
     {
         $stmt = $this->pdo->prepare(
             'INSERT INTO conteudos (
-                titulo, slug, resumo, corpo, link_youtube, categoria_id,
+                titulo, slug, resumo, corpo, imagem_capa, link_youtube, categoria_id,
                 autor_id, status, destaque, publicado_em
              ) VALUES (
-                :titulo, :slug, :resumo, :corpo, :link_youtube, :categoria_id,
+                :titulo, :slug, :resumo, :corpo, :imagem_capa, :link_youtube, :categoria_id,
                 :autor_id, :status, :destaque, :publicado_em
              )
              RETURNING id'
@@ -106,6 +106,7 @@ final class ConteudoAdmin
         $stmt->bindValue(':slug', $dados['slug']);
         $stmt->bindValue(':resumo', $dados['resumo']);
         $stmt->bindValue(':corpo', $dados['corpo']);
+        $stmt->bindValue(':imagem_capa', $dados['imagem_capa']);
         $stmt->bindValue(':link_youtube', $dados['link_youtube']);
         $stmt->bindValue(':categoria_id', $dados['categoria_id'], PDO::PARAM_INT);
         $stmt->bindValue(':autor_id', $dados['autor_id'], PDO::PARAM_INT);
@@ -125,6 +126,7 @@ final class ConteudoAdmin
                  slug = :slug,
                  resumo = :resumo,
                  corpo = :corpo,
+                 imagem_capa = :imagem_capa,
                  link_youtube = :link_youtube,
                  categoria_id = :categoria_id,
                  status = :status,
@@ -136,6 +138,7 @@ final class ConteudoAdmin
         $stmt->bindValue(':slug', $dados['slug']);
         $stmt->bindValue(':resumo', $dados['resumo']);
         $stmt->bindValue(':corpo', $dados['corpo']);
+        $stmt->bindValue(':imagem_capa', $dados['imagem_capa']);
         $stmt->bindValue(':link_youtube', $dados['link_youtube']);
         $stmt->bindValue(':categoria_id', $dados['categoria_id'], PDO::PARAM_INT);
         $stmt->bindValue(':status', $dados['status']);
