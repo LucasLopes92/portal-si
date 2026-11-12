@@ -14,7 +14,8 @@ final class ConteudoAdminService
     {
     }
 
-    public function criar(array $entrada, int $autorId, array $arquivos = []): array
+    /** @param list<string> $pendentes imagens já enviadas para a pasta temporária */
+    public function criar(array $entrada, int $autorId, array $arquivos = [], array $pendentes = []): array
     {
         $validacao = $this->validar($entrada);
         if ($validacao['erros'] !== []) {
@@ -32,7 +33,7 @@ final class ConteudoAdminService
 
         $upload = new ImagemUploadService();
         try {
-            $novas = $upload->receber($arquivos);
+            $novas = $this->receberImagens($upload, $arquivos, $pendentes, 0);
         } catch (RuntimeException $erro) {
             return ['sucesso' => false, 'erros' => ['imagens' => $erro->getMessage()], 'dados' => $dados];
         }
@@ -55,7 +56,8 @@ final class ConteudoAdminService
         return ['sucesso' => true, 'id' => $id, 'erros' => [], 'dados' => $dados];
     }
 
-    public function atualizar(int $id, array $entrada, array $arquivos = []): array
+    /** @param list<string> $pendentes imagens já enviadas para a pasta temporária */
+    public function atualizar(int $id, array $entrada, array $arquivos = [], array $pendentes = []): array
     {
         $atual = $this->model->buscarPorId($id);
         if ($atual === null) {
@@ -98,7 +100,7 @@ final class ConteudoAdminService
         }
         $upload = new ImagemUploadService();
         try {
-            $novas = $upload->receber($arquivos, count($mantidas));
+            $novas = $this->receberImagens($upload, $arquivos, $pendentes, count($mantidas));
         } catch (RuntimeException $erro) {
             return ['sucesso' => false, 'nao_encontrado' => false, 'erros' => ['imagens' => $erro->getMessage()], 'dados' => $dados];
         }
@@ -165,6 +167,18 @@ final class ConteudoAdminService
             'nao_encontrado' => !$excluido,
             'erro' => $excluido ? null : 'Conteúdo não encontrado.',
         ];
+    }
+
+    /** Recebe os arquivos do formulário e move as imagens pendentes para a pasta definitiva. */
+    private function receberImagens(ImagemUploadService $upload, array $arquivos, array $pendentes, int $existentes): array
+    {
+        $novas = $upload->receber($arquivos, $existentes + count($pendentes));
+        try {
+            return array_merge($upload->adotar($pendentes, new ImagemUploadService('temp')), $novas);
+        } catch (Throwable $erro) {
+            $upload->remover($novas);
+            throw $erro;
+        }
     }
 
     private function validar(array $entrada): array

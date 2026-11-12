@@ -18,6 +18,7 @@
 
 <form class="admin-content-form" method="post" enctype="multipart/form-data" action="<?= e($acaoFormulario) ?>">
     <input type="hidden" name="csrf_token" value="<?= e(obter_token_csrf()) ?>">
+    <input type="hidden" name="lote_imagens" value="<?= e($loteImagens) ?>">
 
     <div class="admin-form-field admin-form-field--wide">
         <label for="titulo">Título *</label>
@@ -68,10 +69,20 @@
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+        <?php $pendentes = $imagensPendentes->listar($loteImagens); ?>
+        <?php if ($pendentes !== []): ?>
+            <div class="admin-image-grid" aria-label="Novas imagens aguardando o salvamento">
+                <?php foreach ($pendentes as $indice => $caminho): ?>
+                    <label class="admin-image-item">
+                        <img src="<?= e(app_base_url() . '/' . $caminho) ?>" alt="Nova imagem <?= $indice + 1 ?>">
+                        <span><input type="checkbox" name="remover_pendentes[]" value="<?= $indice ?>"> Remover nova imagem <?= $indice + 1 ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         <input id="imagens" name="imagens[]" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-describedby="imagens-ajuda imagens-selecao">
-        <small id="imagens-selecao" role="status" aria-live="polite">Nenhuma nova imagem selecionada.</small>
-        <div id="imagens-preview" class="admin-image-grid"></div>
-        <?php if ($erros !== []): ?><small>Se havia novas imagens selecionadas, selecione-as novamente antes de salvar.</small><?php endif; ?>
+        <small id="imagens-selecao" role="status"><?php if ($avisoImagens !== null): ?><?= e($avisoImagens) ?><?php elseif ($pendentes !== []): ?><?= count($pendentes) ?> nova(s) imagem(ns) aguardando o salvamento.<?php else: ?>Nenhuma nova imagem enviada.<?php endif; ?> Use “Enviar e ver imagens” para conferir a seleção antes de salvar. Imagens marcadas para remoção saem no próximo envio.</small>
+        <button class="admin-button admin-button--secondary admin-image-send" type="submit" name="acao" value="enviar_imagens" formnovalidate>Enviar e ver imagens</button>
     </div>
 
     <div class="admin-form-field admin-form-field--wide">
@@ -90,4 +101,3 @@
         <a class="admin-button admin-button--secondary" href="<?= e(admin_url('conteudos_listar.php')) ?>">Cancelar</a>
     </div>
 </form>
-<script src="<?= e(app_base_url()) ?>/public/assets/js/publicacao-imagens.js" defer></script>

@@ -28,30 +28,36 @@
         </header>
 
         <?php if ($imagens_detalhe !== []): ?>
-            <section class="portal-gallery" data-gallery aria-label="Imagens da publicação" tabindex="0">
-                <div class="portal-gallery__track" data-gallery-track>
+            <?php $total_imagens = count($imagens_detalhe); ?>
+            <section class="portal-gallery" aria-label="Imagens da publicação">
+                <div class="portal-gallery__track">
                     <?php foreach ($imagens_detalhe as $indice => $caminho): ?>
                         <?php $src = preg_match('~^https://~i', $caminho) ? $caminho : app_base_url() . '/' . ltrim($caminho, '/'); ?>
+                        <?php if ($total_imagens > 1): ?>
+                            <input class="portal-gallery__radio" type="radio" name="galeria-imagem" id="galeria-imagem-<?= $indice ?>" aria-label="Imagem <?= $indice + 1 ?> de <?= $total_imagens ?>"<?= $indice === 0 ? ' checked' : '' ?>>
+                        <?php endif; ?>
                         <figure class="portal-gallery__slide">
-                            <img src="<?= e($src) ?>" alt="<?= e($conteudo_detalhe['titulo']) ?> — imagem <?= $indice + 1 ?> de <?= count($imagens_detalhe) ?>"<?= $indice > 0 ? ' loading="lazy"' : '' ?>>
+                            <img src="<?= e($src) ?>" alt="<?= e($conteudo_detalhe['titulo']) ?> — imagem <?= $indice + 1 ?> de <?= $total_imagens ?>"<?= $indice > 0 ? ' loading="lazy"' : '' ?>>
+                            <?php if ($total_imagens > 1): ?>
+                                <figcaption class="portal-gallery__controls">
+                                    <label for="galeria-imagem-<?= ($indice - 1 + $total_imagens) % $total_imagens ?>" aria-hidden="true">← Anterior</label>
+                                    <span><?= $indice + 1 ?> de <?= $total_imagens ?></span>
+                                    <label for="galeria-imagem-<?= ($indice + 1) % $total_imagens ?>" aria-hidden="true">Próxima →</label>
+                                </figcaption>
+                            <?php endif; ?>
                         </figure>
                     <?php endforeach; ?>
                 </div>
-                <?php if (count($imagens_detalhe) > 1): ?>
-                    <div class="portal-gallery__controls" data-gallery-controls hidden>
-                        <button type="button" data-gallery-prev aria-label="Imagem anterior">← Anterior</button>
-                        <span data-gallery-count role="status" aria-live="polite">1 de <?= count($imagens_detalhe) ?></span>
-                        <button type="button" data-gallery-next aria-label="Próxima imagem">Próxima →</button>
-                    </div>
-                    <div class="portal-gallery__thumbs" data-gallery-thumbs hidden>
+                <?php if ($total_imagens > 1): ?>
+                    <p class="portal-gallery__hint">Use as setas do teclado para trocar de imagem.</p>
+                    <div class="portal-gallery__thumbs" aria-hidden="true">
                         <?php foreach ($imagens_detalhe as $indice => $caminho): ?>
                             <?php $src = preg_match('~^https://~i', $caminho) ? $caminho : app_base_url() . '/' . ltrim($caminho, '/'); ?>
-                            <button type="button" data-gallery-index="<?= $indice ?>" aria-label="Ver imagem <?= $indice + 1 ?>" aria-current="<?= $indice === 0 ? 'true' : 'false' ?>"><img src="<?= e($src) ?>" alt="" loading="lazy"></button>
+                            <label for="galeria-imagem-<?= $indice ?>" title="Ver imagem <?= $indice + 1 ?>"><img src="<?= e($src) ?>" alt="" loading="lazy"></label>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </section>
-            <script src="<?= e(app_base_url()) ?>/public/assets/js/galeria.js" defer></script>
         <?php endif; ?>
 
         <?php if ($youtube_detalhe !== null): ?>

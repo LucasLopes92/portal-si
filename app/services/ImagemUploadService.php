@@ -11,7 +11,7 @@ final class ImagemUploadService
 
     public function __construct(string $pasta = 'publicacoes')
     {
-        if (!in_array($pasta, ['publicacoes', 'inicio'], true)) {
+        if (!in_array($pasta, ['publicacoes', 'inicio', 'temp'], true)) {
             throw new InvalidArgumentException('Pasta de imagem inválida.');
         }
         $this->prefixo = 'public/uploads/' . $pasta . '/';
@@ -77,11 +77,59 @@ final class ImagemUploadService
         return $salvos;
     }
 
+    /**
+     * Move para a pasta deste serviço imagens já enviadas para outra pasta
+     * (por exemplo, a temporária). Só aceita arquivos gerados pelo upload.
+     */
+    public function adotar(array $caminhos, self $origem): array
+    {
+        $movidos = [];
+        try {
+            foreach ($caminhos as $caminho) {
+                if (!$origem->gerenciado($caminho) || !is_file(dirname(__DIR__, 2) . '/' . $caminho)) {
+                    throw new RuntimeException('Uma das imagens enviadas não está mais disponível. Envie-a novamente.');
+                }
+                $pasta = dirname(__DIR__, 2) . '/' . $this->prefixo;
+                if (!is_dir($pasta) && !mkdir($pasta, 0755, true) && !is_dir($pasta)) {
+                    throw new RuntimeException('Não foi possível preparar a pasta das imagens.');
+                }
+                $relativo = $this->prefixo . basename($caminho);
+                if (!rename(dirname(__DIR__, 2) . '/' . $caminho, dirname(__DIR__, 2) . '/' . $relativo)) {
+                    throw new RuntimeException('Não foi possível salvar as imagens. Tente novamente.');
+                }
+                $movidos[] = $relativo;
+            }
+        } catch (Throwable $erro) {
+            $this->remover($movidos);
+            throw $erro;
+        }
+
+        return $movidos;
+    }
+
+    /** Apaga arquivos desta pasta mais antigos que o limite (uso na pasta temporária). */
+    public function limparAntigos(int $segundos): void
+    {
+        $pasta = dirname(__DIR__, 2) . '/' . $this->prefixo;
+        foreach (glob($pasta . '*') ?: [] as $arquivo) {
+            $caminho = $this->prefixo . basename($arquivo);
+            if ($this->gerenciado($caminho) && is_file($arquivo) && filemtime($arquivo) < time() - $segundos) {
+                @unlink($arquivo);
+            }
+        }
+    }
+
+    public function gerenciado(mixed $caminho): bool
+    {
+        return is_string($caminho)
+            && preg_match('~^' . preg_quote($this->prefixo, '~') . '[a-f0-9]{32}\.(jpg|png|webp|gif)$~D', $caminho) === 1;
+    }
+
     /** Só apaga arquivos gerados pelo próprio fluxo de upload. */
     public function remover(array $caminhos): void
     {
         foreach ($caminhos as $caminho) {
-            if (is_string($caminho) && preg_match('~^' . preg_quote($this->prefixo, '~') . '[a-f0-9]{32}\.(jpg|png|webp|gif)$~D', $caminho)) {
+            if ($this->gerenciado($caminho)) {
                 $arquivo = dirname(__DIR__, 2) . '/' . $caminho;
                 if (is_file($arquivo) && !unlink($arquivo)) {
                     error_log('Não foi possível remover imagem de publicação: ' . basename($arquivo));

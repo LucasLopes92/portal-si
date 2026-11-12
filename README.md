@@ -78,9 +78,14 @@ retornam à Home sem acesso às rotas administrativas. Na tela do painel, a logo
 O CSS continua concentrado em `public/assets/css/style.css`, com adaptações
 em 1024px e 768px. Ao rolar a Home, a faixa institucional e a marca saem da
 área visível, enquanto o menu permanece fixo no topo em formato compacto.
-A interface pública usa PHP, HTML e CSS. A galeria utiliza JavaScript para
-navegação por setas, miniaturas e teclado; também permite deslizar as imagens
-horizontalmente em telas de toque.
+O projeto usa somente PHP, HTML e CSS, sem JavaScript. A galeria troca de
+imagem com botões de radio estilizados: os botões anterior/próxima e as
+miniaturas são `label`s, e as setas do teclado funcionam como em qualquer
+grupo de radio. No painel, "Enviar e ver imagens" envia as novas imagens para
+`public/uploads/temp/`, mostra a prévia e permite remover cada uma antes de
+salvar; as imagens pendentes ficam na sessão e são movidas para
+`public/uploads/publicacoes/` ao salvar. No editor da página inicial,
+"Atualizar prévia" envia o formulário para o iframe da prévia sem gravar nada.
 
 As consultas usam os nomes de colunas do schema deste repositório: `ativo`
 em `categorias` e `autor_id` em `conteudos`. Alguns exemplos da apostila usam

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../app/helpers/admin.php';
 require_once __DIR__ . '/../app/models/ConteudoAdmin.php';
 require_once __DIR__ . '/../app/services/ConteudoAdminService.php';
 require_once __DIR__ . '/../app/controllers/ConteudoAdminController.php';
+require_once __DIR__ . '/../app/services/ImagensPendentesService.php';
 
 admin_exigir_acesso();
 
@@ -28,6 +29,9 @@ if ($conteudo === null) {
 
 $categorias = $controller->categorias();
 $erros = [];
+$avisoImagens = null;
+$imagensPendentes = new ImagensPendentesService();
+$loteImagens = $imagensPendentes->lote($_POST['lote_imagens'] ?? null);
 $dados = [
     'titulo' => $conteudo['titulo'],
     'categoria_id' => (int) $conteudo['categoria_id'],
@@ -46,12 +50,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erros['geral'] = 'A sessão do formulário expirou. Atualize a página e tente novamente.';
         $dados = array_merge($dados, $_POST);
     } else {
-        $resultado = $controller->editar($id, $_POST, $_FILES['imagens'] ?? []);
-        $erros = $resultado['erros'];
-        $dados = array_merge($dados, $resultado['dados']);
-        $dados['remover_imagens'] = $_POST['remover_imagens'] ?? [];
+        // As imagens vão primeiro para a pasta temporária, para aparecerem na prévia do formulário.
+        $removerExistentes = is_array($_POST['remover_imagens'] ?? null) ? $_POST['remover_imagens'] : [];
+        $totalExistentes = count(imagens_publicacao($conteudo));
+        $mantidasExistentes = count(array_filter(
+            range(0, max(0, $totalExistentes - 1)),
+            fn (int $indice): bool => $indice < $totalExistentes && !in_array((string) $indice, $removerExistentes, true)
+        ));
+        $erroImagens = $imagensPendentes->atualizar($loteImagens, $_POST['remover_pendentes'] ?? null, $_FILES['imagens'] ?? [], $mantidasExistentes);
+        $dados['remover_imagens'] = $removerExistentes;
 
-        if ($resultado['sucesso']) {
+        if (($_POST['acao'] ?? '') === 'enviar_imagens' || $erroImagens !== null) {
+            $dados = array_merge($dados, array_intersect_key($_POST, $dados));
+            $dados['destaque'] = isset($_POST['destaque']);
+            if ($erroImagens !== null) {
+                $erros['imagens'] = $erroImagens;
+            } else {
+                $avisoImagens = 'Imagens atualizadas. Confira a prévia abaixo e salve as alterações para publicá-las.';
+            }
+        } else {
+            $resultado = $controller->editar($id, $_POST, [], $imagensPendentes->listar($loteImagens));
+            $erros = $resultado['erros'];
+            $dados = array_merge($dados, $resultado['dados']);
+        }
+
+        if (isset($resultado) && $resultado['sucesso']) {
+            $imagensPendentes->limpar($loteImagens);
             admin_renovar_csrf();
             admin_definir_flash('sucesso', 'Conteúdo atualizado com sucesso.');
             header('Location: ' . admin_url('conteudos_listar.php'));
@@ -59,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (!empty($resultado['nao_encontrado'])) {
+            $imagensPendentes->limpar($loteImagens);
             admin_definir_flash('error', 'Conteúdo não encontrado.');
             header('Location: ' . admin_url('conteudos_listar.php'));
             exit;

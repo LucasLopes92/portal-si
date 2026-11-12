@@ -38,13 +38,13 @@ final class ConteudoAdminController
         return $this->model->listarCategoriasAtivas();
     }
 
-    public function cadastrar(array $dados, int $autorId, array $arquivos = []): array
+    public function cadastrar(array $dados, int $autorId, array $arquivos = [], array $pendentes = []): array
     {
         if ($this->service === null) {
             $this->service = new ConteudoAdminService($this->model);
         }
 
-        return $this->service->criar($dados, $autorId, $arquivos);
+        return $this->service->criar($dados, $autorId, $arquivos, $pendentes);
     }
 
     public function buscar(int $id): ?array
@@ -52,13 +52,13 @@ final class ConteudoAdminController
         return $this->model->buscarPorId($id);
     }
 
-    public function editar(int $id, array $dados, array $arquivos = []): array
+    public function editar(int $id, array $dados, array $arquivos = [], array $pendentes = []): array
     {
         if ($this->service === null) {
             $this->service = new ConteudoAdminService($this->model);
         }
 
-        return $this->service->atualizar($id, $dados, $arquivos);
+        return $this->service->atualizar($id, $dados, $arquivos, $pendentes);
     }
 
     public function excluir(int $id): array

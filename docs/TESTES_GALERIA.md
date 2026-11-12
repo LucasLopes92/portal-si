@@ -20,7 +20,9 @@ Verificações concluídas:
 - Rejeição do décimo primeiro arquivo, preservando as imagens anteriores.
 - Rejeição de arquivo acima de 2 MB, preservando as imagens anteriores.
 - Exclusão da publicação e remoção do arquivo restante.
-- Ausência de erros de JavaScript durante o fluxo.
+- Ausência de erros de JavaScript durante o fluxo (em 12/11/2026 o projeto
+  deixou de usar JavaScript; a galeria e as prévias passaram a usar CSS e
+  envios de formulário).
 
 Os 13 testes anteriores de `tests/painel_admin.php` também passaram após a
 migração do banco. O upload valida MIME e dimensões no servidor; o campo
