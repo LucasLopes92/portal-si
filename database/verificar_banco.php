@@ -18,6 +18,7 @@ $tabelasObrigatorias = [
     'midias',
     'tags',
     'usuarios',
+    'configuracao_inicio',
 ];
 
 $colunasObrigatorias = [
@@ -28,13 +29,16 @@ $colunasObrigatorias = [
         'resumo',
         'corpo',
         'imagem_capa',
+        'imagens',
         'autor_id',
         'status',
         'destaque',
+        'destaque_em',
         'publicado_em',
         'criado_em',
         'atualizado_em',
     ],
+    'configuracao_inicio' => ['titulo', 'descricao', 'imagem', 'imagem_alt', 'imagem_posicao', 'atualizado_por'],
 ];
 
 $stmtTabelas = $pdo->query(

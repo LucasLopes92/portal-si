@@ -1,200 +1,111 @@
-# Portal SI
+# Portal de Comunicação SI
 
-Projeto de comunicação do curso de Sistemas de Informação, desenvolvido em PHP nativo com PostgreSQL e arquitetura Mini-MVC.
+Portal do curso de Sistemas de Informação das Faculdades ESUCRI, desenvolvido em Projeto de Extensão IV, 6ª fase, 2026/2. Entrega em 12/11/2026. Professor: Me. Jucemar Formigoni Candido.
 
-## Organização da aplicação
+| Integrante | Responsabilidade |
+| --- | --- |
+| Diogo Leonardo Arcenio | Back-end |
+| Luis Henrique Serafim | Front-end |
+| Lucas Lopes | Banco de dados |
 
-O fluxo principal segue esta ordem:
+## Funcionalidades
 
-```text
-Visitante abre /portal-si/ e vê a Home pública
-          ↓
-Seleciona "Fazer login"
-          ↓
-Usuário envia e-mail e senha
-          ↓
-AuthController
-Recebe os campos e chama o serviço
-          ↓
-AuthService
-Solicita a busca do usuário
-          ↓
-Usuario (Model)
-Executa SELECT no PostgreSQL e retorna o usuário
-          ↓
-AuthService
-Confere a senha e se a conta pode entrar
-          ↓
-AuthController
-Estabelece a sessão com os helpers e redireciona conforme o perfil
-          ↓
-Conta admin: painel administrativo completo
-Outras contas: Home autenticada, sem acesso administrativo
-```
+- Home pública e editorias Notícias e Eventos, com autoria, categoria, data, resumo e detalhe.
+- Busca por palavra e data, filtros combinados e paginação de até nove publicações nas editorias.
+- Manchete definida pela marcação de destaque mais recente; demais destaques em blocos menores.
+- Cadastro de contas comuns, login, logout e painel exclusivo para perfil `admin`.
+- CRUD de publicações com rascunho, publicação, arquivamento, destaque e exclusão.
+- Filtro de categoria no gerenciamento: Todos, Notícias e Eventos.
+- Seleção de várias imagens do computador e galeria com navegação. A primeira imagem é a capa.
+- Configuração dos textos e da foto da Home, com prévia antes de salvar.
+- Link opcional de vídeo do YouTube no detalhe.
 
-### Responsabilidades
+A versão atual utiliza PHP, HTML e CSS, sem JavaScript próprio. Para visualizar imagens selecionadas antes de salvar, use **Enviar e ver imagens**. No editor da Home, use **Atualizar prévia**; **Salvar e publicar** aplica a configuração ao portal. A busca pública é aplicada pelo envio do formulário.
 
-- **Controller:** recebe as requisições do navegador, chama os serviços e decide respostas e redirecionamentos.
-- **Service:** concentra as regras de negócio, como validação, autenticação e geração de hash.
-- **Model:** concentra as operações de dados e os comandos SQL parametrizados via PDO.
-- **View:** exibe formulários, mensagens e páginas HTML para o usuário.
-- **Helpers:** reúnem funções compartilhadas de segurança, sessão, validação e escape de HTML.
+## Requisitos
 
-Assim, uma alteração na consulta fica no Model, uma alteração na regra fica no Service e uma alteração na apresentação fica na View.
+Ambiente verificado: Windows, Apache/XAMPP, PHP 8.2.12 e PostgreSQL 18.4 local na porta 5432. No PHP, habilite `pdo_pgsql`, `pgsql`, `mbstring` e `fileinfo`. O PostgreSQL precisa disponibilizar a extensão `citext`. O Apache deve permitir as regras `.htaccess` (`AllowOverride All`) e escrita em `public/uploads/`.
 
-## Estrutura inicial
+## Conexão atual do projeto
+
+O portal roda no XAMPP em `http://localhost/portal-si/` e utiliza o PostgreSQL do servidor `painel.formasoftware.cloud:5455`, na base `porta-si`. As 20 publicações, categorias e configuração da Home já estão nessa base. As fotos continuam em `public/uploads/` no computador que executa o portal.
+
+A conexão está no arquivo privado `config/database-uri.local.txt`, ignorado pelo Git. O administrador do portal é `admin@esucri.com.br`, com a senha definida para a demonstração. A configuração anterior do banco local foi preservada em um backup privado dentro de `config/`. Não é necessário importar novamente o SQL no banco remoto para usar esta instalação.
+
+## Instalação com os dados de demonstração
+
+1. Copie a pasta do código para `C:\xampp\htdocs\portal-si` e inicie o Apache.
+2. No PostgreSQL, crie uma base **vazia** chamada `portal_si`.
+3. Restaure `Banco/portal_si_demonstracao.sql`, incluído no pacote de entrega, nessa base. O arquivo reúne estrutura e dados; não aplique o seed depois dele.
+4. Crie `config/database-uri.local.txt`, usando sua própria senha do PostgreSQL:
 
 ```text
-portal-si/
-├── public/                 # Única pasta exposta pelo servidor web
-│   └── assets/             # CSS e imagens públicas
-├── app/
-│   ├── controllers/        # Orquestração das requisições
-│   ├── services/           # Regras de negócio
-│   ├── models/             # Acesso aos dados
-│   ├── helpers/            # Funções auxiliares e segurança
-│   └── views/              # Telas e templates
-├── config/                 # Configurações da aplicação
-├── database/               # Scripts schema.sql e seed.sql
-└── docs/                   # Documentação complementar
+postgresql://postgres:SUA_SENHA@127.0.0.1:5432/portal_si?sslmode=disable
 ```
 
-## Home pública (Aula 09)
+Se a senha contiver caracteres reservados de URL, codifique-os (`@` vira `%40`, por exemplo). Não publique esse arquivo. Alternativamente, configure as variáveis `PORTAL_DB_HOST`, `PORTAL_DB_PORT`, `PORTAL_DB_NAME`, `PORTAL_DB_USER`, `PORTAL_DB_PASSWORD` e `PORTAL_DB_SSLMODE` no ambiente do Apache e do PHP CLI.
 
-A página inicial está em `public/index.php`. No XAMPP, abra
-`http://localhost/portal-si/`; o `index.php` da raiz redireciona para a Home.
-O menu consulta as categorias
-ativas do PostgreSQL e cada link filtra as publicações dessa categoria. A Home
-mostra os conteúdos publicados, do mais recente para o mais antigo, e um estado vazio
-quando ainda não há publicações. O cabeçalho e o rodapé ficam em
-`app/views/layout/`, incluídos pela view `app/views/home/index.php`.
-A Home é pública e mostra apenas as categorias acessíveis sem autenticação.
-O botão "Fazer login" leva ao formulário de acesso. Uma conta com perfil
-`admin` abre diretamente o painel administrativo completo; os demais perfis
-retornam à Home sem acesso às rotas administrativas. Na tela do painel, a logo ESUCRI e o botão
-"Ir para a Home" levam à Home mantendo a sessão ativa. Na Home, o botão
-"Painel" permite retornar ao painel.
+5. Preserve as pastas `public/uploads/publicacoes/` e `public/uploads/inicio/` do pacote; o SQL referencia os arquivos pelos caminhos relativos.
+6. Abra `http://localhost/portal-si/`.
+7. Para entrar no painel, use o acesso de demonstração indicado em `ACESSO_AVALIADOR.txt`, entregue separadamente do repositório.
 
-O CSS continua concentrado em `public/assets/css/style.css`, com adaptações
-em 1024px e 768px. Ao rolar a Home, a faixa institucional e a marca saem da
-área visível, enquanto o menu permanece fixo no topo em formato compacto.
-O projeto usa somente PHP, HTML e CSS, sem JavaScript. A galeria troca de
-imagem com botões de radio estilizados: os botões anterior/próxima e as
-miniaturas são `label`s, e as setas do teclado funcionam como em qualquer
-grupo de radio. No painel, "Enviar e ver imagens" envia as novas imagens para
-`public/uploads/temp/`, mostra a prévia e permite remover cada uma antes de
-salvar; as imagens pendentes ficam na sessão e são movidas para
-`public/uploads/publicacoes/` ao salvar. No editor da página inicial,
-"Atualizar prévia" envia o formulário para o iframe da prévia sem gravar nada.
-
-As consultas usam os nomes de colunas do schema deste repositório: `ativo`
-em `categorias` e `autor_id` em `conteudos`. Alguns exemplos da apostila usam
-nomes diferentes. Para executar localmente, configure o PostgreSQL pela
-`config/database.php` ou pelas variáveis `PORTAL_DB_*` e aplique
-`database/schema.sql` e `database/seed.sql` se o banco ainda não estiver
-preparado.
-
-## Painel administrativo
-
-### Prioridade dos destaques
-
-As editorias exibem até nove publicações por página, contando os destaques.
-Publicações comuns aparecem em linhas compactas, com imagem à esquerda e
-texto à direita. A paginação mantém os filtros e a ordem de leitura.
-
-A Home e as editorias priorizam os conteúdos marcados como destaque. A última
-marcação ocupa a manchete principal, mesmo que a publicação seja antiga. Os
-outros destaques aparecem em blocos menores, com fundo suave na cor da categoria.
-Ao continuar a paginação ou pesquisar, o destaque recebe uma identificação
-discreta. Editar apenas o texto mantém a prioridade; desmarcar e salvar retira
-o destaque, e marcar novamente registra uma nova prioridade.
-
-O instante é mantido pelo banco em `conteudos.destaque_em`, sem depender do
-relógio do navegador. A ordenação ocorre antes da paginação para preservar
-todos os registros. A busca continua ordenada por data de publicação.
-Em bancos anteriores, aplique `database/migrations/20261111_destaques.sql`.
-Os destaques existentes usam inicialmente a última atualização conhecida,
-pois não havia histórico da marcação. Verifique com `php tests/destaques.php`.
-
-### Seleção e galeria de imagens
-
-No cadastro e na edição, o campo **Imagens da publicação** permite selecionar
-vários arquivos do computador, visualizar a seleção e remover itens antes de
-salvar. A primeira imagem é usada como capa. No detalhe da publicação, a
-galeria oferece botões anterior/próxima, miniaturas, teclas de seta e rolagem
-horizontal em telas de toque.
-
-São aceitos até dez arquivos JPG, PNG, WebP ou GIF por publicação, com até
-2 MB por imagem, até 25 megapixels e até 6 MB em cada envio. A validação do
-servidor confere o tipo real do arquivo. Os arquivos ficam em
-`public/uploads/publicacoes/`, com nomes aleatórios e proteção do Apache.
-Na edição é possível manter, adicionar ou marcar imagens para remoção.
-A exclusão de uma imagem ou publicação também remove os arquivos gerados
-pelo upload correspondente.
-
-O banco local já recebeu a nova coluna `conteudos.imagens`. Para atualizar
-outro banco existente, execute `database/migrations/20261111_galeria.sql` antes
-de usar esta versão. Novas instalações usam o `database/schema.sql` atualizado.
-Capas cadastradas anteriormente continuam disponíveis.
-
-O painel utiliza a mesma autenticação do portal e permite acesso somente ao
-perfil `admin`. Os pontos de entrada HTTP ficam em `administrador/`; a lógica
-segue a estrutura MVC existente em `app/`.
-
-Para validar o banco e o fluxo administrativo:
+Exemplo de restauração no PowerShell, ajustando o caminho do pacote:
 
 ```powershell
-C:\xampp\php\php.exe database\verificar_banco.php
-C:\xampp\php\php.exe tests\painel_admin.php
+& 'C:\Program Files\PostgreSQL\18\bin\createdb.exe' -U postgres portal_si
+& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -U postgres -d portal_si -v ON_ERROR_STOP=1 -f 'C:\caminho\Banco\portal_si_demonstracao.sql'
 ```
 
-## Banco remoto
+O dump contém 20 publicações fictícias (10 notícias e 10 eventos), seis categorias, configuração da Home e contas anonimizadas para avaliação. As contas e senhas do ambiente original não integram o dump. A conta do avaliador funciona no banco restaurado; não altera a conta administrativa já utilizada pela equipe.
 
-### Editar a abertura da página inicial
+## Instalação somente da estrutura
 
-No painel, abra **Página inicial** (`administrador/inicio.php`). É possível
-alterar a chamada, o título, a apresentação, a foto, seu enquadramento vertical
-e o texto e destino do botão. A prévia utiliza o mesmo componente e os mesmos
-estilos da Home, com visualização de computador ou celular.
+Para começar sem publicações, crie uma base vazia e aplique `database/schema.sql`. Ele cria nove tabelas, índices, restrições, gatilhos e a configuração padrão da Home. `database/seed.sql` inclui seis categorias e um administrador inicial; use-o somente em instalação controlada, pois ele atualiza a conta com o mesmo e-mail. Para avaliação, prefira o dump de demonstração e suas credenciais conhecidas.
 
-Digitar e selecionar uma foto atualiza somente a prévia. O botão **Salvar e
-publicar** valida o formulário e aplica a configuração ao portal. Sem um novo
-arquivo, a imagem atual é preservada. O upload aceita uma imagem de até 2 MB,
-com validação do tipo real, armazenada em `public/uploads/inicio/`.
+`CREATE TABLE IF NOT EXISTS` não atualiza colunas de bases antigas. Para atualizar uma instalação anterior, faça backup e aplique as três migrações em `database/migrations/`: galeria, destaques e configuração da Home. Não execute novamente o schema sobre o banco em uso como substituto dessas migrações.
 
-A configuração é mantida na tabela `configuracao_inicio`. Em bancos existentes,
-aplique `database/migrations/20261111_configuracao_inicio.sql`; o banco local já
-foi atualizado. Tanto a edição quanto a rota de prévia exigem perfil admin.
-Verificação: `php tests/configuracao_inicio.php`.
+## Organização
 
-A fotografia inicial é ilustrativa, obtida no Unsplash:
-https://images.unsplash.com/photo-1522071820081-009f0129c71c
-Licença: https://unsplash.com/license
+| Pasta ou arquivo | Função |
+| --- | --- |
+| `index.php` | Redireciona para a Home pública |
+| `public/` | Entrada pública, estilos e imagens |
+| `administrador/` | Rotas administrativas protegidas |
+| `app/controllers/` | Recebe requisições e define respostas |
+| `app/services/` | Validação e regras de negócio |
+| `app/models/` | Consultas parametrizadas por PDO |
+| `app/views/` | Interface pública e administrativa |
+| `app/helpers/` | Escape, sessão, autorização e utilitários |
+| `config/` | Configuração de conexão e sessão |
+| `database/` | Schema, seed, migrações e verificação |
+| `tests/` | Suítes de integração e regressão |
+| `docs/` | Roteiros e registros técnicos |
 
-### Conexão local atual
+Fluxo: navegador → rota PHP → Controller → Service → Model/PDO → PostgreSQL → View. As rotas do painel conferem sessão e perfil `admin`; perfis `aluno` e `editor` utilizam a área pública autenticada.
 
-O ambiente local utiliza PostgreSQL em `127.0.0.1:5432`, no banco `portal_si`.
-A conexão privada está em `config/database-uri.local.txt`, ignorado pelo Git.
-Esse arquivo tem prioridade sobre `config/aiven-uri.local.txt`, mantendo a
-configuração remota disponível. `PORTAL_DATABASE_URL` e as variáveis
-`PORTAL_DB_*`, quando definidas, continuam tendo prioridade.
+## Validação
 
-Para retornar ao Aiven, remova ou renomeie o arquivo privado
-`config/database-uri.local.txt`. O banco local existente é preservado;
-não é necessário executar novamente o schema ou o seed.
+Execute na raiz do projeto:
 
-O menu público exibe, por enquanto, apenas **Notícias** e **Eventos**. Cada aba
-tem sua apresentação e consulta as publicações cadastradas no painel
-administrativo, exibindo título, resumo, categoria, autor e data do banco.
-Somente conteúdos com status `publicado` e data de publicação preenchida
-aparecem no portal. As alterações feitas pelo painel são refletidas ao
-recarregar a página.
+```powershell
+& 'C:\xampp\php\php.exe' database\verificar_banco.php
+& 'C:\xampp\php\php.exe' tests\painel_admin.php
+& 'C:\xampp\php\php.exe' tests\destaques.php
+& 'C:\xampp\php\php.exe' tests\configuracao_inicio.php
+```
 
-As publicações são listadas integralmente em fileiras de três no desktop,
-da mais recente para a mais antiga. O botão **Buscar** abre um formulário
-recolhível abaixo do cabeçalho, com palavra-chave e data de publicação.
-Os filtros podem ser combinados e permanecem na URL; **Limpar** restaura a
-lista completa da categoria. A data considera o fuso de São Paulo.
+As suítes criam dados temporários e fazem rollback ou restauração ao terminar. O relatório da entrega identifica os testes efetivamente executados; aprovação automatizada não equivale à aceitação pessoal da equipe.
 
-A conexao suporta PostgreSQL no Aiven com SSL e credenciais privadas, usando
-o mesmo arquivo no Apache e no PHP CLI. Veja [configuracao do Aiven](docs/AIVEN.md).
+## Segurança e arquivos
+
+Senhas usam `password_hash` e `password_verify`; formulários mutáveis exigem CSRF, sessões são regeneradas após login, saídas textuais recebem escape e consultas usam parâmetros. Uploads aceitam JPG, PNG, WebP e GIF: até dez imagens por publicação, 2 MB por arquivo, 6 MB por envio e 25 megapixels por imagem, com conferência de MIME e dimensões. Arquivos recebem nomes aleatórios e proteção do Apache. Ao remover imagens ou excluir uma publicação, os arquivos gerenciados correspondentes são removidos.
+
+O código é servido no caminho XAMPP indicado acima; não se deve afirmar que apenas `public/` fica exposta nessa instalação. As regras `.htaccess` precisam permanecer no pacote. Credenciais `config/*.local.*`, backups e uploads não são versionados. O pacote completo inclui as fotos necessárias à demonstração; um clone do Git sozinho não as contém.
+
+## Limitações e continuidade
+
+O painel ainda não oferece gestão própria de categorias, tags, agenda estruturada, mídias ou auditoria automática. A categoria pública Eventos usa registros em `conteudos`; a tabela `eventos` é uma estrutura para continuidade. A galeria atual persiste em `conteudos.imagens` (JSONB), sem utilizar a tabela `midias`. O portal depende de Apache/PHP e PostgreSQL em execução; a configuração remota Aiven não é necessária para a demonstração local.
+
+Os recursos de mídia são adicionais ao escopo textual exigido na Etapa 2. Permanecem como continuidade a ampliação dos testes de usabilidade, hospedagem, monitoramento e as interfaces auxiliares.
+
+Fotografias de demonstração: Unsplash, com origens em [docs/DEMO_PUBLICACOES.md](docs/DEMO_PUBLICACOES.md). Foto inicial: `https://images.unsplash.com/photo-1522071820081-009f0129c71c`. Licença: `https://unsplash.com/license`.
