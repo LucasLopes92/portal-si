@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../models/ConteudoAdmin.php';
 require_once __DIR__ . '/../helpers/publico.php';
+require_once __DIR__ . '/ImagemUploadService.php';
 
 final class ConteudoAdminService
 {
@@ -13,7 +14,7 @@ final class ConteudoAdminService
     {
     }
 
-    public function criar(array $entrada, int $autorId): array
+    public function criar(array $entrada, int $autorId, array $arquivos = []): array
     {
         $validacao = $this->validar($entrada);
         if ($validacao['erros'] !== []) {
@@ -29,9 +30,19 @@ final class ConteudoAdminService
         $dados['autor_id'] = $autorId;
         $dados['publicado_em'] = $dados['status'] === 'publicado' ? date(DATE_ATOM) : null;
 
+        $upload = new ImagemUploadService();
+        try {
+            $novas = $upload->receber($arquivos);
+        } catch (RuntimeException $erro) {
+            return ['sucesso' => false, 'erros' => ['imagens' => $erro->getMessage()], 'dados' => $dados];
+        }
+        $dados['imagens'] = $novas;
+        $dados['imagem_capa'] = $novas[0] ?? $dados['imagem_capa'];
+
         try {
             $id = $this->model->criar($dados);
         } catch (PDOException $exception) {
+            $upload->remover($novas);
             error_log('Falha ao cadastrar conteúdo administrativo: ' . $exception->getMessage());
 
             return [
@@ -44,7 +55,7 @@ final class ConteudoAdminService
         return ['sucesso' => true, 'id' => $id, 'erros' => [], 'dados' => $dados];
     }
 
-    public function atualizar(int $id, array $entrada): array
+    public function atualizar(int $id, array $entrada, array $arquivos = []): array
     {
         $atual = $this->model->buscarPorId($id);
         if ($atual === null) {
@@ -56,6 +67,8 @@ final class ConteudoAdminService
             ];
         }
 
+        // As referências existentes são obtidas do banco, nunca do formulário.
+        $entrada['imagem_capa'] = $atual['imagem_capa'] ?? '';
         $validacao = $this->validar($entrada);
         if ($validacao['erros'] !== []) {
             return [
@@ -72,9 +85,30 @@ final class ConteudoAdminService
             ? ($atual['publicado_em'] ?: date(DATE_ATOM))
             : null;
 
+        $anteriores = imagens_publicacao($atual);
+        $remover = is_array($entrada['remover_imagens'] ?? null) ? $entrada['remover_imagens'] : [];
+        $mantidas = [];
+        $removidas = [];
+        foreach ($anteriores as $indice => $caminho) {
+            if (in_array((string) $indice, $remover, true)) {
+                $removidas[] = $caminho;
+            } else {
+                $mantidas[] = $caminho;
+            }
+        }
+        $upload = new ImagemUploadService();
+        try {
+            $novas = $upload->receber($arquivos, count($mantidas));
+        } catch (RuntimeException $erro) {
+            return ['sucesso' => false, 'nao_encontrado' => false, 'erros' => ['imagens' => $erro->getMessage()], 'dados' => $dados];
+        }
+        $dados['imagens'] = array_merge($mantidas, $novas);
+        $dados['imagem_capa'] = $dados['imagens'][0] ?? null;
+
         try {
             $atualizado = $this->model->atualizar($id, $dados);
         } catch (PDOException $exception) {
+            $upload->remover($novas);
             error_log('Falha ao atualizar conteúdo administrativo: ' . $exception->getMessage());
 
             return [
@@ -83,6 +117,12 @@ final class ConteudoAdminService
                 'erros' => ['geral' => 'Não foi possível atualizar o conteúdo.'],
                 'dados' => $dados,
             ];
+        }
+
+        if ($atualizado) {
+            $upload->remover($removidas);
+        } else {
+            $upload->remover($novas);
         }
 
         return [
@@ -114,6 +154,10 @@ final class ConteudoAdminService
                 'nao_encontrado' => false,
                 'erro' => 'Não foi possível excluir o conteúdo.',
             ];
+        }
+
+        if ($excluido) {
+            (new ImagemUploadService())->remover(imagens_publicacao($conteudo));
         }
 
         return [

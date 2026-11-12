@@ -9,13 +9,15 @@ final class Conteudo
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function listarPublicados(?int $limite = 9, ?int $categoriaId = null, int $offset = 0, array $filtros = []): array
+    public function listarPublicados(?int $limite = 9, ?int $categoriaId = null, int $offset = 0, array $filtros = [], bool $priorizarDestaques = false): array
     {
-        $sql = 'SELECT c.id, c.titulo, c.slug, c.resumo, c.corpo, c.imagem_capa,
+        $sql = 'SELECT c.id, c.titulo, c.slug, c.resumo, c.corpo, c.imagem_capa, c.destaque, c.destaque_em,
                        c.publicado_em, cat.nome AS categoria_nome,
                        cat.slug AS categoria_slug, u.nome AS autor_nome '
             . $this->origemPublicados($categoriaId, $filtros)
-            . ' ORDER BY c.publicado_em DESC, c.id DESC';
+            . ($priorizarDestaques
+                ? ' ORDER BY c.destaque DESC, c.destaque_em DESC NULLS LAST, c.publicado_em DESC, c.id DESC'
+                : ' ORDER BY c.publicado_em DESC, c.id DESC');
         if ($limite !== null) {
             $sql .= ' LIMIT :limite OFFSET :offset';
         }
@@ -51,7 +53,7 @@ final class Conteudo
     public function buscarPublicadoPorId(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            'SELECT c.id, c.titulo, c.resumo, c.corpo, c.imagem_capa,
+            'SELECT c.id, c.titulo, c.resumo, c.corpo, c.imagem_capa, c.imagens,
                     c.link_youtube, c.publicado_em,
                     cat.nome AS categoria_nome, cat.slug AS categoria_slug,
                     u.nome AS autor_nome

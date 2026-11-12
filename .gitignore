@@ -1,3 +1,5 @@
 # Credenciais privadas da conexao e backups de banco.
 /config/*.local.*
 /database/backups/
+/public/uploads/publicacoes/
+/public/uploads/inicio/

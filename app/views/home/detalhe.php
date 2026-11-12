@@ -12,6 +12,7 @@
     <?php else: ?>
         <?php
         $imagem_detalhe = imagem_publica_src($conteudo_detalhe['imagem_capa'] ?? null);
+        $imagens_detalhe = imagens_publicacao($conteudo_detalhe);
         $youtube_detalhe = youtube_embed_url($conteudo_detalhe['link_youtube'] ?? null);
         $data_detalhe = (new DateTimeImmutable($conteudo_detalhe['publicado_em']))
             ->setTimezone(new DateTimeZone('America/Sao_Paulo'));
@@ -26,8 +27,31 @@
             </p>
         </header>
 
-        <?php if ($imagem_detalhe !== null): ?>
-            <img class="portal-article__cover" src="<?= e($imagem_detalhe) ?>" alt="<?= e($conteudo_detalhe['titulo']) ?>">
+        <?php if ($imagens_detalhe !== []): ?>
+            <section class="portal-gallery" data-gallery aria-label="Imagens da publicação" tabindex="0">
+                <div class="portal-gallery__track" data-gallery-track>
+                    <?php foreach ($imagens_detalhe as $indice => $caminho): ?>
+                        <?php $src = preg_match('~^https://~i', $caminho) ? $caminho : app_base_url() . '/' . ltrim($caminho, '/'); ?>
+                        <figure class="portal-gallery__slide">
+                            <img src="<?= e($src) ?>" alt="<?= e($conteudo_detalhe['titulo']) ?> — imagem <?= $indice + 1 ?> de <?= count($imagens_detalhe) ?>"<?= $indice > 0 ? ' loading="lazy"' : '' ?>>
+                        </figure>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (count($imagens_detalhe) > 1): ?>
+                    <div class="portal-gallery__controls" data-gallery-controls hidden>
+                        <button type="button" data-gallery-prev aria-label="Imagem anterior">← Anterior</button>
+                        <span data-gallery-count role="status" aria-live="polite">1 de <?= count($imagens_detalhe) ?></span>
+                        <button type="button" data-gallery-next aria-label="Próxima imagem">Próxima →</button>
+                    </div>
+                    <div class="portal-gallery__thumbs" data-gallery-thumbs hidden>
+                        <?php foreach ($imagens_detalhe as $indice => $caminho): ?>
+                            <?php $src = preg_match('~^https://~i', $caminho) ? $caminho : app_base_url() . '/' . ltrim($caminho, '/'); ?>
+                            <button type="button" data-gallery-index="<?= $indice ?>" aria-label="Ver imagem <?= $indice + 1 ?>" aria-current="<?= $indice === 0 ? 'true' : 'false' ?>"><img src="<?= e($src) ?>" alt="" loading="lazy"></button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+            <script src="<?= e(app_base_url()) ?>/public/assets/js/galeria.js" defer></script>
         <?php endif; ?>
 
         <?php if ($youtube_detalhe !== null): ?>

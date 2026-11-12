@@ -46,11 +46,13 @@ CREATE TABLE IF NOT EXISTS conteudos (
     resumo          VARCHAR(500),
     corpo           TEXT NOT NULL,
     imagem_capa     VARCHAR(255),
+    imagens         JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(imagens) = 'array'),
     link_youtube    VARCHAR(500),
     categoria_id    BIGINT NOT NULL,
     autor_id        BIGINT NOT NULL,
     status          VARCHAR(20) NOT NULL DEFAULT 'rascunho',
     destaque        BOOLEAN NOT NULL DEFAULT FALSE,
+    destaque_em     TIMESTAMPTZ,
     publicado_em    TIMESTAMPTZ,
     criado_em       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -183,5 +185,43 @@ DROP TRIGGER IF EXISTS trg_eventos_atualizado_em ON eventos;
 CREATE TRIGGER trg_eventos_atualizado_em
     BEFORE UPDATE ON eventos
     FOR EACH ROW EXECUTE FUNCTION atualizar_data_alteracao();
+
+-- Guarda a marcação de destaque; editar apenas o texto não muda a prioridade.
+CREATE OR REPLACE FUNCTION registrar_destaque_conteudo()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT NEW.destaque THEN
+        NEW.destaque_em = NULL;
+    ELSIF TG_OP = 'INSERT' THEN
+        NEW.destaque_em = clock_timestamp();
+    ELSIF NOT OLD.destaque THEN
+        NEW.destaque_em = clock_timestamp();
+    ELSE
+        NEW.destaque_em = OLD.destaque_em;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS trg_conteudos_destaque_em ON conteudos;
+CREATE TRIGGER trg_conteudos_destaque_em
+BEFORE INSERT OR UPDATE ON conteudos
+FOR EACH ROW EXECUTE FUNCTION registrar_destaque_conteudo();
+CREATE INDEX IF NOT EXISTS idx_conteudos_destaque_em
+ON conteudos (destaque_em DESC, id DESC) WHERE destaque = TRUE;
+
+CREATE TABLE IF NOT EXISTS configuracao_inicio (
+    id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+    etiqueta VARCHAR(100) NOT NULL DEFAULT 'Portal de Comunicação SI · ESUCRI',
+    titulo VARCHAR(140) NOT NULL DEFAULT 'Sistemas de Informação em pauta.',
+    descricao VARCHAR(300) NOT NULL DEFAULT 'Notícias, projetos e encontros que conectam a comunidade acadêmica. Acompanhe o que acontece no curso e participe da vida no campus.',
+    botao_texto VARCHAR(50) NOT NULL DEFAULT 'Explorar publicações',
+    botao_destino VARCHAR(20) NOT NULL DEFAULT 'publicacoes' CHECK (botao_destino IN ('publicacoes', 'noticias', 'eventos')),
+    imagem VARCHAR(255) NOT NULL DEFAULT 'public/assets/images/inicio-campus.jpg',
+    imagem_alt VARCHAR(180) NOT NULL DEFAULT 'Estudantes trabalhando em equipe com seus computadores.',
+    imagem_posicao SMALLINT NOT NULL DEFAULT 50 CHECK (imagem_posicao BETWEEN 0 AND 100),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_por BIGINT REFERENCES usuarios(id) ON DELETE SET NULL
+);
+INSERT INTO configuracao_inicio (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
 COMMIT;

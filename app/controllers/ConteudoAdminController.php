@@ -14,20 +14,22 @@ final class ConteudoAdminController
     {
     }
 
-    public function listar(int $paginaSolicitada, int $porPagina = 10): array
+    public function listar(int $paginaSolicitada, int $porPagina = 10, ?string $categoria = null): array
     {
         $porPagina = max(1, min($porPagina, 50));
-        $total = $this->model->contarTodos();
+        $categoria = in_array($categoria, ['noticias', 'eventos'], true) ? $categoria : null;
+        $total = $this->model->contarTodos($categoria);
         $totalPaginas = max(1, (int) ceil($total / $porPagina));
         $pagina = max(1, min($paginaSolicitada, $totalPaginas));
         $offset = ($pagina - 1) * $porPagina;
 
         return [
-            'itens' => $this->model->listarPaginado($porPagina, $offset),
+            'itens' => $this->model->listarPaginado($porPagina, $offset, $categoria),
             'pagina' => $pagina,
             'por_pagina' => $porPagina,
             'total' => $total,
             'total_paginas' => $totalPaginas,
+            'categoria' => $categoria,
         ];
     }
 
@@ -36,13 +38,13 @@ final class ConteudoAdminController
         return $this->model->listarCategoriasAtivas();
     }
 
-    public function cadastrar(array $dados, int $autorId): array
+    public function cadastrar(array $dados, int $autorId, array $arquivos = []): array
     {
         if ($this->service === null) {
             $this->service = new ConteudoAdminService($this->model);
         }
 
-        return $this->service->criar($dados, $autorId);
+        return $this->service->criar($dados, $autorId, $arquivos);
     }
 
     public function buscar(int $id): ?array
@@ -50,13 +52,13 @@ final class ConteudoAdminController
         return $this->model->buscarPorId($id);
     }
 
-    public function editar(int $id, array $dados): array
+    public function editar(int $id, array $dados, array $arquivos = []): array
     {
         if ($this->service === null) {
             $this->service = new ConteudoAdminService($this->model);
         }
 
-        return $this->service->atualizar($id, $dados);
+        return $this->service->atualizar($id, $dados, $arquivos);
     }
 
     public function excluir(int $id): array

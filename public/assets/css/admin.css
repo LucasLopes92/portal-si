@@ -788,3 +788,41 @@ body {
         grid-template-columns: 1fr;
     }
 }
+/* Seleção e revisão das imagens da publicação. */
+.admin-image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.admin-image-item { display: flex; min-width: 0; flex-direction: column; gap: 8px; padding: 10px; border: 1px solid #dce1e9; border-radius: 10px; background: #fff; }
+.admin-image-item img { width: 100%; height: 120px; object-fit: contain; border-radius: 6px; background: #f3f4f7; }
+.admin-image-item span { font-size: .85rem; overflow-wrap: anywhere; }
+.admin-image-item input[type="checkbox"] { width: auto; min-height: auto; margin-right: 5px; }
+.admin-image-item:has(input:checked) { opacity: .55; border-color: #ba1b2c; }
+.admin-image-item button { align-self: start; padding: 7px 12px; background: #fff; border: 1px solid #ba1b2c; border-radius: 6px; color: #ba1b2c; cursor: pointer; }
+.admin-content-form input[type="file"]::file-selector-button { margin-right: 15px; padding: 10px 14px; background: #f1f3f8; border: 1px solid #cbd1de; border-radius: 6px; cursor: pointer; font: inherit; }
+.inicio-editor { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); align-items: start; gap: 26px; margin-top: 25px; }
+.inicio-editor__form { display: grid; gap: 20px; min-width: 0; padding: 24px; border: 1px solid #dce1e9; border-radius: 10px; background: #fff; }
+.inicio-editor__form textarea { min-height: 0; }
+.inicio-editor__divider { height: 1px; background: #e3e6ed; }
+.inicio-editor__form input[type="range"] { padding: 0; box-shadow: none; border: 0; accent-color: #b21f2d; }
+.inicio-editor__form input[type="file"] { font-size: .75rem; }
+.inicio-editor__form output { float: right; color: #677284; font-weight: 400; }
+.inicio-editor__note { margin: 0; color: #677284; font-size: .77rem; line-height: 1.6; }
+.inicio-editor__discard { justify-self: start; padding: 0; border: 0; background: none; color: #a61b32; font: inherit; font-size: .75rem; text-decoration: underline; cursor: pointer; }
+.inicio-editor [hidden] { display: none; }
+.inicio-preview { position: sticky; top: 24px; min-width: 0; overflow: hidden; border: 1px solid #dce1e9; border-radius: 10px; background: #fff; }
+.inicio-preview__toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 17px; border-bottom: 1px solid #e3e6ed; }
+.inicio-preview__toolbar > div:first-child { display: flex; align-items: center; gap: 8px; }
+.inicio-preview__toolbar h2 { margin: 0; font-size: .86rem; }
+.inicio-preview__live { width: 7px; height: 7px; border-radius: 50%; background: #258465; }
+.inicio-preview__devices { display: flex; gap: 4px; padding: 3px; border-radius: 6px; background: #f1f3f7; }
+.inicio-preview__devices button { padding: 7px 9px; border: 0; border-radius: 4px; background: transparent; color: #667183; font: inherit; font-size: .7rem; cursor: pointer; }
+.inicio-preview__devices button[aria-pressed="true"] { background: #fff; color: #a61b32; box-shadow: 0 1px 4px #00000012; }
+.inicio-preview__canvas { display: flex; justify-content: center; align-items: start; min-height: 120px; padding: 0; overflow: hidden; background: #e8ebf0; }
+.inicio-preview__frame-wrap { position: relative; flex-shrink: 0; overflow: hidden; }
+.inicio-preview iframe { display: block; border: 0; transform-origin: top left; }
+.inicio-preview__caption { margin: 0; padding: 16px 18px; color: #677284; font-size: .75rem; line-height: 1.6; }
+@media (max-width: 1100px) { .inicio-editor { grid-template-columns: minmax(0, 1fr); } .inicio-preview { position: relative; top: auto; grid-row: 1; } }
+@media (max-width: 520px) { .inicio-editor__form { padding: 18px; } .inicio-preview__toolbar { padding: 12px; } }
+.admin-content-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 18px 22px; border-bottom: 1px solid #e1e5ed; }
+.admin-content-filters__item { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 8px 18px; border: 1px solid #dce1e9; border-radius: 6px; color: #536174; background: #fff; font-size: .82rem; font-weight: 700; text-decoration: none; }
+.admin-content-filters__item:hover { color: #a61b32; border-color: #a61b32; text-decoration: none; }
+.admin-content-filters__item.is-current { color: #fff; background: #ad1c32; border-color: #ad1c32; }
+.admin-content-filters__item:focus-visible { outline: 3px solid #a61b3240; outline-offset: 3px; }

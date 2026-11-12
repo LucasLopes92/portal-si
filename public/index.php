@@ -8,6 +8,7 @@ require_once __DIR__ . '/../app/helpers/seguranca.php';
 require_once __DIR__ . '/../app/helpers/publico.php';
 require_once __DIR__ . '/../app/models/Categoria.php';
 require_once __DIR__ . '/../app/models/Conteudo.php';
+require_once __DIR__ . '/../app/models/ConfiguracaoInicio.php';
 
 iniciar_sessao_segura();
 
@@ -59,7 +60,7 @@ $conteudos_recentes = [];
 $total_publicacoes = 0;
 $pagina_solicitada = filter_input(INPUT_GET, 'pagina', FILTER_VALIDATE_INT);
 $pagina_solicitada = is_int($pagina_solicitada) && $pagina_solicitada > 0 ? $pagina_solicitada : 1;
-$por_pagina = 6;
+$por_pagina = 9;
 $total_paginas = 1;
 $pagina_atual = 1;
 $categoria_id = $categoria_atual === null ? null : (int) $categoria_atual['id'];
@@ -74,13 +75,14 @@ if (($categoria_atual !== null || $slug_categoria === null) && $erro_busca === '
                 $por_pagina,
                 $categoria_id,
                 ($pagina_atual - 1) * $por_pagina,
-                $filtros_busca
+                $filtros_busca,
+                !$busca_ativa
             );
         } else {
-            $conteudos_recentes = $model_conteudo->listarPublicados(null, null, 0, $filtros_busca);
+            $conteudos_recentes = $model_conteudo->listarPublicados(null, null, 0, $filtros_busca, !$busca_ativa);
         }
     } else {
-        $conteudos_recentes = $model_conteudo->listarPublicados(9);
+        $conteudos_recentes = $model_conteudo->listarPublicados(9, null, 0, [], true);
     }
 }
 
@@ -120,4 +122,7 @@ if (array_key_exists('conteudo', $_GET)) {
     exit;
 }
 
+if (!$listagem_publica && $slug_categoria === null) {
+    $config_inicio = (new ConfiguracaoInicio($pdo))->obter();
+}
 require_once __DIR__ . '/../app/views/home/index.php';

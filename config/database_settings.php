@@ -7,7 +7,9 @@ declare(strict_types=1);
  * Apache e no PHP CLI. O URI nunca deve ser versionado nem exibido ao visitante.
  */
 $uri = getenv('PORTAL_DATABASE_URL');
-$arquivoUri = __DIR__ . '/aiven-uri.local.txt';
+$arquivoUri = is_file(__DIR__ . '/database-uri.local.txt')
+    ? __DIR__ . '/database-uri.local.txt'
+    : __DIR__ . '/aiven-uri.local.txt';
 if (($uri === false || trim($uri) === '') && is_file($arquivoUri)) {
     $uri = trim((string) file_get_contents($arquivoUri));
     if ($uri === '') {

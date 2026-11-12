@@ -25,11 +25,13 @@ $dados = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!validar_token_csrf($_POST['csrf_token'] ?? null)) {
+    if ($_POST === [] && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+        $erros['imagens'] = 'O envio excedeu o limite do servidor. Envie até 6 MB de imagens por vez.';
+    } elseif (!validar_token_csrf($_POST['csrf_token'] ?? null)) {
         $erros['geral'] = 'A sessão do formulário expirou. Atualize a página e tente novamente.';
         $dados = array_merge($dados, $_POST);
     } else {
-        $resultado = $controller->cadastrar($_POST, (int) $_SESSION['usuario_id']);
+        $resultado = $controller->cadastrar($_POST, (int) $_SESSION['usuario_id'], $_FILES['imagens'] ?? []);
         $erros = $resultado['erros'];
         $dados = array_merge($dados, $resultado['dados']);
 

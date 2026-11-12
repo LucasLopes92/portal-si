@@ -15,8 +15,11 @@ $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/a
     <meta name="description" content="Portal de Comunicação do curso de Sistemas de Informação das Faculdades ESUCRI.">
     <title><?= e($titulo_pagina ?? 'Portal SI') ?> | Portal SI - ESUCRI</title>
     <link rel="stylesheet" href="<?= e(app_base_url()) ?>/public/assets/css/style.css?v=<?= e($css_version) ?>">
+    <?php if (isset($config_inicio)): ?>
+        <link rel="stylesheet" href="<?= e(app_base_url()) ?>/public/assets/css/home-cover.css?v=<?= e(substr(hash_file('sha256', __DIR__ . '/../../../public/assets/css/home-cover.css'), 0, 12)) ?>">
+    <?php endif; ?>
 </head>
-<body class="portal-page<?= $categoria_atual !== null ? ' portal-page--' . e($categoria_atual['slug']) : '' ?>">
+<body class="portal-page<?= $categoria_atual !== null ? ' portal-page--' . e($categoria_atual['slug']) : '' ?><?= isset($config_inicio) ? ' portal-page--home' : '' ?>">
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
     <?php if ($mostrar_aviso_logout): ?>
         <div class="portal-logout-notice" role="status">Logout realizado com sucesso.</div>
@@ -31,7 +34,7 @@ $css_version = substr((string) hash_file('sha256', __DIR__ . '/../../../public/a
             <?php if (isset($_SESSION['usuario_id'])): ?>
                 <div class="portal-header__identity portal-header__identity--signed-in">Olá, <strong><?= e((string) ($_SESSION['usuario_nome'] ?? '')) ?></strong></div>
             <?php elseif (!$listagem_publica): ?>
-                <div class="portal-header__identity">Um espaço para conectar ideias, pessoas e oportunidades.</div>
+                <div class="portal-header__identity">Notícias, projetos e vida acadêmica</div>
             <?php endif; ?>
         </div>
         <nav class="portal-nav" aria-label="Navegação principal">

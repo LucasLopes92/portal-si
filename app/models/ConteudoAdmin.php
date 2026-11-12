@@ -8,13 +8,18 @@ final class ConteudoAdmin
     {
     }
 
-    public function contarTodos(): int
+    public function contarTodos(?string $categoriaSlug = null): int
     {
-        return (int) $this->pdo->query('SELECT COUNT(*) FROM conteudos')->fetchColumn();
+        if ($categoriaSlug === null) {
+            return (int) $this->pdo->query('SELECT COUNT(*) FROM conteudos')->fetchColumn();
+        }
+        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM conteudos c INNER JOIN categorias cat ON cat.id=c.categoria_id WHERE cat.slug=:categoria');
+        $stmt->execute(['categoria'=>$categoriaSlug]);
+        return (int) $stmt->fetchColumn();
     }
 
     /** @return array<int, array<string, mixed>> */
-    public function listarPaginado(int $limite, int $offset): array
+    public function listarPaginado(int $limite, int $offset, ?string $categoriaSlug = null): array
     {
         $stmt = $this->pdo->prepare(
             'SELECT c.id, c.titulo, c.slug, c.status, c.destaque,
@@ -22,12 +27,14 @@ final class ConteudoAdmin
                     cat.nome AS categoria_nome, u.nome AS autor_nome
              FROM conteudos c
              INNER JOIN categorias cat ON cat.id = c.categoria_id
-             INNER JOIN usuarios u ON u.id = c.autor_id
-             ORDER BY COALESCE(c.publicado_em, c.criado_em) DESC, c.id DESC
+             INNER JOIN usuarios u ON u.id = c.autor_id'
+             . ($categoriaSlug === null ? '' : ' WHERE cat.slug = :categoria')
+             . ' ORDER BY COALESCE(c.publicado_em, c.criado_em) DESC, c.id DESC
              LIMIT :limite OFFSET :offset'
         );
         $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        if ($categoriaSlug !== null) { $stmt->bindValue(':categoria', $categoriaSlug); }
         $stmt->execute();
 
         return $stmt->fetchAll();
@@ -80,7 +87,7 @@ final class ConteudoAdmin
     {
         $stmt = $this->pdo->prepare(
             'SELECT id, titulo, slug, resumo, corpo, link_youtube, categoria_id,
-                    autor_id, status, destaque, publicado_em, imagem_capa
+                    autor_id, status, destaque, publicado_em, imagem_capa, imagens
              FROM conteudos
              WHERE id = :id'
         );
@@ -95,10 +102,10 @@ final class ConteudoAdmin
         $stmt = $this->pdo->prepare(
             'INSERT INTO conteudos (
                 titulo, slug, resumo, corpo, imagem_capa, link_youtube, categoria_id,
-                autor_id, status, destaque, publicado_em
+                autor_id, status, destaque, publicado_em, imagens
              ) VALUES (
                 :titulo, :slug, :resumo, :corpo, :imagem_capa, :link_youtube, :categoria_id,
-                :autor_id, :status, :destaque, :publicado_em
+                :autor_id, :status, :destaque, :publicado_em, :imagens
              )
              RETURNING id'
         );
@@ -113,6 +120,7 @@ final class ConteudoAdmin
         $stmt->bindValue(':status', $dados['status']);
         $stmt->bindValue(':destaque', $dados['destaque'], PDO::PARAM_BOOL);
         $stmt->bindValue(':publicado_em', $dados['publicado_em']);
+        $stmt->bindValue(':imagens', json_encode($dados['imagens'] ?? [], JSON_THROW_ON_ERROR));
         $stmt->execute();
 
         return (int) $stmt->fetchColumn();
@@ -127,6 +135,7 @@ final class ConteudoAdmin
                  resumo = :resumo,
                  corpo = :corpo,
                  imagem_capa = :imagem_capa,
+                 imagens = :imagens,
                  link_youtube = :link_youtube,
                  categoria_id = :categoria_id,
                  status = :status,
@@ -145,6 +154,7 @@ final class ConteudoAdmin
         $stmt->bindValue(':destaque', $dados['destaque'], PDO::PARAM_BOOL);
         $stmt->bindValue(':publicado_em', $dados['publicado_em']);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindValue(':imagens', json_encode($dados['imagens'] ?? [], JSON_THROW_ON_ERROR));
         $stmt->execute();
 
         return $stmt->rowCount() === 1;

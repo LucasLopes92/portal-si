@@ -16,7 +16,7 @@
     </div>
 <?php endif; ?>
 
-<form class="admin-content-form" method="post" action="<?= e($acaoFormulario) ?>">
+<form class="admin-content-form" method="post" enctype="multipart/form-data" action="<?= e($acaoFormulario) ?>">
     <input type="hidden" name="csrf_token" value="<?= e(obter_token_csrf()) ?>">
 
     <div class="admin-form-field admin-form-field--wide">
@@ -55,9 +55,23 @@
     </div>
 
     <div class="admin-form-field admin-form-field--wide">
-        <label for="imagem_capa">Imagem de capa</label>
-        <input id="imagem_capa" name="imagem_capa" type="text" maxlength="255" placeholder="https://... ou public/assets/imagens/capa.jpg" value="<?= e((string) ($dados['imagem_capa'] ?? '')) ?>">
-        <small>Informe uma URL HTTPS ou um caminho relativo dentro da pasta pública. O campo é opcional.</small>
+        <label for="imagens">Imagens da publicação</label>
+        <small id="imagens-ajuda">Selecione uma ou mais imagens do computador. Até 10 imagens por publicação, com até 2 MB cada e 6 MB por envio. JPG, PNG, WebP ou GIF. A primeira imagem será a capa.</small>
+        <?php $imagensExistentes = isset($conteudo) ? imagens_publicacao($conteudo) : []; ?>
+        <?php if ($imagensExistentes !== []): ?>
+            <div class="admin-image-grid">
+                <?php foreach ($imagensExistentes as $indice => $caminho): ?>
+                    <label class="admin-image-item">
+                        <img src="<?= e(preg_match('~^https://~i', $caminho) ? $caminho : app_base_url() . '/' . ltrim($caminho, '/')) ?>" alt="Imagem <?= $indice + 1 ?> da publicação">
+                        <span><input type="checkbox" name="remover_imagens[]" value="<?= $indice ?>"<?= in_array((string) $indice, (array) ($dados['remover_imagens'] ?? []), true) ? ' checked' : '' ?>> Remover imagem <?= $indice + 1 ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <input id="imagens" name="imagens[]" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-describedby="imagens-ajuda imagens-selecao">
+        <small id="imagens-selecao" role="status" aria-live="polite">Nenhuma nova imagem selecionada.</small>
+        <div id="imagens-preview" class="admin-image-grid"></div>
+        <?php if ($erros !== []): ?><small>Se havia novas imagens selecionadas, selecione-as novamente antes de salvar.</small><?php endif; ?>
     </div>
 
     <div class="admin-form-field admin-form-field--wide">
@@ -69,9 +83,11 @@
         <input name="destaque" type="checkbox" value="1"<?= !empty($dados['destaque']) ? ' checked' : '' ?>>
         <span>Marcar como conteúdo de destaque</span>
     </label>
+    <small class="admin-form-field--wide">O último conteúdo marcado vira a manchete principal. Os demais aparecem em destaques menores. Editar o texto não altera essa prioridade.</small>
 
     <div class="admin-form-actions admin-form-field--wide">
         <button class="admin-button admin-button--primary" type="submit"><?= e($rotuloBotao) ?></button>
         <a class="admin-button admin-button--secondary" href="<?= e(admin_url('conteudos_listar.php')) ?>">Cancelar</a>
     </div>
 </form>
+<script src="<?= e(app_base_url()) ?>/public/assets/js/publicacao-imagens.js" defer></script>

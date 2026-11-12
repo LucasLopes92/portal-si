@@ -12,6 +12,12 @@
 <?php endif; ?>
 
 <section class="admin-panel admin-panel--table" aria-label="Lista de conteúdos">
+    <nav class="admin-content-filters" aria-label="Filtrar conteúdos por categoria">
+        <?php foreach ([''=>'Todos', 'noticias'=>'Notícias', 'eventos'=>'Eventos'] as $valor=>$rotulo): ?>
+            <?php $selecionado = ($categoriaFiltro ?? '') === $valor; ?>
+            <a class="admin-content-filters__item<?= $selecionado ? ' is-current' : '' ?>" href="<?= e(admin_url('conteudos_listar.php' . ($valor === '' ? '' : '?categoria=' . $valor))) ?>"<?= $selecionado ? ' aria-current="page"' : '' ?>><?= e($rotulo) ?></a>
+        <?php endforeach; ?>
+    </nav>
     <div class="admin-table-summary">
         <p><strong><?= (int) $paginacao['total'] ?></strong> conteúdo(s) encontrado(s)</p>
         <p>Página <?= (int) $paginacao['pagina'] ?> de <?= (int) $paginacao['total_paginas'] ?></p>
@@ -32,7 +38,7 @@
             <tbody>
                 <?php if ($paginacao['itens'] === []): ?>
                     <tr>
-                        <td class="admin-table__empty" colspan="6">Nenhum conteúdo cadastrado até o momento.</td>
+                        <td class="admin-table__empty" colspan="6"><?= $categoriaFiltro === null ? 'Nenhum conteúdo cadastrado até o momento.' : 'Nenhum conteúdo encontrado nesta categoria.' ?></td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($paginacao['itens'] as $item): ?>
@@ -68,7 +74,8 @@
     <?php if ($paginacao['total_paginas'] > 1): ?>
         <nav class="admin-pagination" aria-label="Paginação de conteúdos">
             <?php for ($pagina = 1; $pagina <= $paginacao['total_paginas']; $pagina++): ?>
-                <a<?= $pagina === $paginacao['pagina'] ? ' class="is-current" aria-current="page"' : '' ?> href="<?= e(admin_url('conteudos_listar.php?pagina=' . $pagina)) ?>"><?= $pagina ?></a>
+                <?php $parametrosPagina = ['pagina'=>$pagina]; if ($categoriaFiltro !== null) { $parametrosPagina['categoria'] = $categoriaFiltro; } ?>
+                <a<?= $pagina === $paginacao['pagina'] ? ' class="is-current" aria-current="page"' : '' ?> href="<?= e(admin_url('conteudos_listar.php?' . http_build_query($parametrosPagina))) ?>"><?= $pagina ?></a>
             <?php endfor; ?>
         </nav>
     <?php endif; ?>

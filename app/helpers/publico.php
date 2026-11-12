@@ -2,6 +2,20 @@
 
 declare(strict_types=1);
 
+/** Inclui a capa antiga para manter publicações anteriores compatíveis. */
+function imagens_publicacao(array $conteudo): array
+{
+    $imagens = $conteudo['imagens'] ?? [];
+    if (is_string($imagens)) {
+        $imagens = json_decode($imagens, true) ?: [];
+    }
+    $imagens = is_array($imagens) ? $imagens : [];
+    if (!empty($conteudo['imagem_capa'])) {
+        array_unshift($imagens, $conteudo['imagem_capa']);
+    }
+    return array_values(array_unique(array_filter($imagens, static fn ($src) => is_string($src) && imagem_publica_src($src) !== null)));
+}
+
 function imagem_publica_src(?string $caminho): ?string
 {
     $caminho = trim((string) $caminho);

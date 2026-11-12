@@ -12,7 +12,9 @@ $pagina = filter_input(INPUT_GET, 'pagina', FILTER_VALIDATE_INT);
 $pagina = is_int($pagina) && $pagina > 0 ? $pagina : 1;
 
 $controller = new ConteudoAdminController(new ConteudoAdmin($pdo));
-$paginacao = $controller->listar($pagina);
+$categoriaInformada = isset($_GET['categoria']) && is_string($_GET['categoria']) ? $_GET['categoria'] : null;
+$paginacao = $controller->listar($pagina, 10, $categoriaInformada);
+$categoriaFiltro = $paginacao['categoria'];
 $flash = admin_consumir_flash();
 $tituloPagina = 'Conteúdos';
 $paginaAtual = 'conteudos';

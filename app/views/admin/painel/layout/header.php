@@ -29,6 +29,7 @@ $cssVersao = is_file($cssAdmin)
         <nav class="admin-navigation" aria-label="Navegação administrativa">
             <a<?= $paginaAtual === 'dashboard' ? ' class="is-current" aria-current="page"' : '' ?> href="<?= e(admin_url()) ?>">Visão geral</a>
             <a<?= $paginaAtual === 'conteudos' ? ' class="is-current" aria-current="page"' : '' ?> href="<?= e(admin_url('conteudos_listar.php')) ?>">Conteúdos</a>
+            <a<?= $paginaAtual === 'inicio' ? ' class="is-current" aria-current="page"' : '' ?> href="<?= e(admin_url('inicio.php')) ?>">Página inicial</a>
             <a href="<?= e(app_base_url() . '/public/index.php') ?>">Ver portal público</a>
         </nav>
 
