@@ -26,7 +26,19 @@ A versão atual utiliza PHP, HTML e CSS, sem JavaScript próprio. Para visualiza
 
 Ambiente verificado: Windows, Apache/XAMPP, PHP 8.2.12 e PostgreSQL 18.4 local na porta 5432. No PHP, habilite `pdo_pgsql`, `pgsql`, `mbstring` e `fileinfo`. O PostgreSQL precisa disponibilizar a extensão `citext`. O Apache deve permitir as regras `.htaccess` (`AllowOverride All`) e escrita em `public/uploads/`.
 
-## Instalação pelo clone (professor / avaliador)
+## Acesso do professor ao banco de avaliacao
+
+Para usar os dados existentes da equipe, clone o projeto em `C:\xampp\htdocs\portal-si` e habilite as extensoes PHP indicadas nos requisitos. Depois crie o arquivo `config/database-uri.local.txt` com esta unica linha:
+
+```text
+postgresql://admin:Senha%40123@painel.formasoftware.cloud:5455/porta-si?sslmode=disable
+```
+
+Inicie o Apache e abra `http://localhost/portal-si/`. Confira que nao ha variaveis `PORTAL_DATABASE_URL` ou `PORTAL_DB_*` sobrescrevendo a conexao. Esse caminho usa o banco remoto ja preenchido: **nao execute o instalador, o schema, as migracoes ou o seed** nele.
+
+Esta conexao foi disponibilizada pela equipe exclusivamente para a avaliacao academica e deixara de funcionar quando o banco temporario for excluido. A senha da conexao acima e do PostgreSQL; o login do painel e separado e deve ser obtido com a equipe. O portal publico pode ser consultado sem login. As fotos das publicacoes existentes precisam ser copiadas da pasta de uploads do pacote de entrega, pois nao sao versionadas; a imagem padrao da Home esta no Git.
+
+## Instalacao com banco proprio (alternativa)
 
 Este caminho usa somente os arquivos versionados e um PostgreSQL próprio do avaliador. Não depende das credenciais do banco da equipe nem do pacote de entrega. O portal carrega variáveis do ambiente do PHP ou `config/database-uri.local.txt`; ele **não carrega `.env` automaticamente**.
 
@@ -58,12 +70,6 @@ O instalador imprime o login `avaliador@portal-si.test` e uma senha aleatória: 
 
 6. Inicie o Apache e abra `http://localhost/portal-si/`. Entre com o acesso impresso e cadastre notícias/eventos pelo painel. A Home usa a imagem incluída no Git. Esta instalação começa sem publicações; fotos enviadas e dados do banco da equipe pertencem ao pacote de demonstração descrito abaixo.
 
-### Para acessar o mesmo banco remoto da equipe
-
-Solicite à equipe o URI de conexão por canal privado e salve-o em `config/database-uri.local.txt` (ou use `PORTAL_DATABASE_URL`). Obtenha também o login do portal por canal privado. Não execute o instalador, schema ou seed nesse banco existente. Para visualizar as fotos das publicações existentes, obtenha também a pasta de uploads da equipe.
-
-As credenciais reais e os arquivos `config/*.local.*` ficam fora do Git. A senha do PostgreSQL dá acesso ao banco; o login do painel é uma credencial separada. Um clone não recebe essas credenciais automaticamente.
-
 ## Conexão atual do projeto
 
 O portal roda no XAMPP em `http://localhost/portal-si/` e utiliza o PostgreSQL do servidor `painel.formasoftware.cloud:5455`, na base `porta-si`. As 20 publicações, categorias e configuração da Home já estão nessa base. As fotos continuam em `public/uploads/` no computador que executa o portal.
@@ -81,7 +87,7 @@ A conexão está no arquivo privado `config/database-uri.local.txt`, ignorado pe
 postgresql://postgres:SUA_SENHA@127.0.0.1:5432/portal_si?sslmode=disable
 ```
 
-Se a senha contiver caracteres reservados de URL, codifique-os (`@` vira `%40`, por exemplo). Não publique esse arquivo. Alternativamente, configure as variáveis `PORTAL_DB_HOST`, `PORTAL_DB_PORT`, `PORTAL_DB_NAME`, `PORTAL_DB_USER`, `PORTAL_DB_PASSWORD` e `PORTAL_DB_SSLMODE` no ambiente do Apache e do PHP CLI.
+Se a senha contiver caracteres reservados de URL, codifique-os (`@` vira `%40`, por exemplo). Esse arquivo local continua ignorado pelo Git; a conexao temporaria para avaliacao esta documentada acima. Alternativamente, configure as variáveis `PORTAL_DB_HOST`, `PORTAL_DB_PORT`, `PORTAL_DB_NAME`, `PORTAL_DB_USER`, `PORTAL_DB_PASSWORD` e `PORTAL_DB_SSLMODE` no ambiente do Apache e do PHP CLI.
 
 5. Preserve as pastas `public/uploads/publicacoes/` e `public/uploads/inicio/` do pacote; o SQL referencia os arquivos pelos caminhos relativos.
 6. Abra `http://localhost/portal-si/`.
