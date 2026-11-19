@@ -1,0 +1,1174 @@
+{
+    "data": "12\/11\/2026",
+    "php": "8.2.12",
+    "postgresql": "18.4",
+    "tables": {
+        "auditoria": {
+            "count": 0,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('auditoria_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "usuario_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "acao",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "tabela_afetada",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "registro_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "detalhes",
+                    "data_type": "jsonb",
+                    "udt_name": "jsonb",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "ip_origem",
+                    "data_type": "inet",
+                    "udt_name": "inet",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "fk_auditoria_usuario",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL"
+                },
+                {
+                    "conname": "auditoria_acao_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL acao"
+                },
+                {
+                    "conname": "auditoria_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "auditoria_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "auditoria_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                }
+            ]
+        },
+        "categorias": {
+            "count": 6,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('categorias_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "nome",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "slug",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 120,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "descricao",
+                    "data_type": "text",
+                    "udt_name": "text",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "icone",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "ordem",
+                    "data_type": "integer",
+                    "udt_name": "int4",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "0"
+                },
+                {
+                    "column_name": "ativo",
+                    "data_type": "boolean",
+                    "udt_name": "bool",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "true"
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_categorias_nome",
+                    "contype": "c",
+                    "definition": "CHECK ((char_length(btrim((nome)::text)) > 0))"
+                },
+                {
+                    "conname": "ck_categorias_ordem",
+                    "contype": "c",
+                    "definition": "CHECK ((ordem >= 0))"
+                },
+                {
+                    "conname": "categorias_ativo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL ativo"
+                },
+                {
+                    "conname": "categorias_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "categorias_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "categorias_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "categorias_nome_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL nome"
+                },
+                {
+                    "conname": "categorias_ordem_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL ordem"
+                },
+                {
+                    "conname": "categorias_slug_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL slug"
+                },
+                {
+                    "conname": "categorias_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                },
+                {
+                    "conname": "categorias_slug_key",
+                    "contype": "u",
+                    "definition": "UNIQUE (slug)"
+                }
+            ]
+        },
+        "configuracao_inicio": {
+            "count": 1,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "smallint",
+                    "udt_name": "int2",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "1"
+                },
+                {
+                    "column_name": "etiqueta",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "NO",
+                    "column_default": "'Portal de Comunicação SI · ESUCRI'::character varying"
+                },
+                {
+                    "column_name": "titulo",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 140,
+                    "is_nullable": "NO",
+                    "column_default": "'Sistemas de Informação em pauta.'::character varying"
+                },
+                {
+                    "column_name": "descricao",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 300,
+                    "is_nullable": "NO",
+                    "column_default": "'Notícias, projetos e encontros que conectam a comunidade acadêmica. Acompanhe o que acontece no curso e participe da vida no campus.'::character varying"
+                },
+                {
+                    "column_name": "botao_texto",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 50,
+                    "is_nullable": "NO",
+                    "column_default": "'Explorar publicações'::character varying"
+                },
+                {
+                    "column_name": "botao_destino",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 20,
+                    "is_nullable": "NO",
+                    "column_default": "'publicacoes'::character varying"
+                },
+                {
+                    "column_name": "imagem",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 255,
+                    "is_nullable": "NO",
+                    "column_default": "'public\/assets\/images\/inicio-campus.jpg'::character varying"
+                },
+                {
+                    "column_name": "imagem_alt",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 180,
+                    "is_nullable": "NO",
+                    "column_default": "'Estudantes trabalhando em equipe com seus computadores.'::character varying"
+                },
+                {
+                    "column_name": "imagem_posicao",
+                    "data_type": "smallint",
+                    "udt_name": "int2",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "50"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_por",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "configuracao_inicio_botao_destino_check",
+                    "contype": "c",
+                    "definition": "CHECK (((botao_destino)::text = ANY ((ARRAY['publicacoes'::character varying, 'noticias'::character varying, 'eventos'::character varying])::text[])))"
+                },
+                {
+                    "conname": "configuracao_inicio_id_check",
+                    "contype": "c",
+                    "definition": "CHECK ((id = 1))"
+                },
+                {
+                    "conname": "configuracao_inicio_imagem_posicao_check",
+                    "contype": "c",
+                    "definition": "CHECK (((imagem_posicao >= 0) AND (imagem_posicao <= 100)))"
+                },
+                {
+                    "conname": "configuracao_inicio_atualizado_por_fkey",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (atualizado_por) REFERENCES usuarios(id) ON DELETE SET NULL"
+                },
+                {
+                    "conname": "configuracao_inicio_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "configuracao_inicio_botao_destino_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL botao_destino"
+                },
+                {
+                    "conname": "configuracao_inicio_botao_texto_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL botao_texto"
+                },
+                {
+                    "conname": "configuracao_inicio_descricao_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL descricao"
+                },
+                {
+                    "conname": "configuracao_inicio_etiqueta_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL etiqueta"
+                },
+                {
+                    "conname": "configuracao_inicio_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "configuracao_inicio_imagem_alt_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL imagem_alt"
+                },
+                {
+                    "conname": "configuracao_inicio_imagem_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL imagem"
+                },
+                {
+                    "conname": "configuracao_inicio_imagem_posicao_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL imagem_posicao"
+                },
+                {
+                    "conname": "configuracao_inicio_titulo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL titulo"
+                },
+                {
+                    "conname": "configuracao_inicio_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                }
+            ]
+        },
+        "conteudo_tags": {
+            "count": 0,
+            "columns": [
+                {
+                    "column_name": "conteudo_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "tag_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "fk_conteudo_tags_conteudo",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (conteudo_id) REFERENCES conteudos(id) ON DELETE CASCADE"
+                },
+                {
+                    "conname": "fk_conteudo_tags_tag",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE"
+                },
+                {
+                    "conname": "conteudo_tags_conteudo_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL conteudo_id"
+                },
+                {
+                    "conname": "conteudo_tags_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "conteudo_tags_tag_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL tag_id"
+                },
+                {
+                    "conname": "conteudo_tags_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (conteudo_id, tag_id)"
+                }
+            ]
+        },
+        "conteudos": {
+            "count": 20,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('conteudos_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "titulo",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 200,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "slug",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 220,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "resumo",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 500,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "corpo",
+                    "data_type": "text",
+                    "udt_name": "text",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "imagem_capa",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 255,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "link_youtube",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 500,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "categoria_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "autor_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "status",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 20,
+                    "is_nullable": "NO",
+                    "column_default": "'rascunho'::character varying"
+                },
+                {
+                    "column_name": "destaque",
+                    "data_type": "boolean",
+                    "udt_name": "bool",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "false"
+                },
+                {
+                    "column_name": "publicado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "imagens",
+                    "data_type": "jsonb",
+                    "udt_name": "jsonb",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "'[]'::jsonb"
+                },
+                {
+                    "column_name": "destaque_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_conteudos_status",
+                    "contype": "c",
+                    "definition": "CHECK (((status)::text = ANY ((ARRAY['rascunho'::character varying, 'publicado'::character varying, 'arquivado'::character varying])::text[])))"
+                },
+                {
+                    "conname": "conteudos_imagens_check",
+                    "contype": "c",
+                    "definition": "CHECK ((jsonb_typeof(imagens) = 'array'::text))"
+                },
+                {
+                    "conname": "fk_conteudos_autor",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE RESTRICT"
+                },
+                {
+                    "conname": "fk_conteudos_categoria",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT"
+                },
+                {
+                    "conname": "conteudos_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "conteudos_autor_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL autor_id"
+                },
+                {
+                    "conname": "conteudos_categoria_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL categoria_id"
+                },
+                {
+                    "conname": "conteudos_corpo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL corpo"
+                },
+                {
+                    "conname": "conteudos_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "conteudos_destaque_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL destaque"
+                },
+                {
+                    "conname": "conteudos_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "conteudos_imagens_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL imagens"
+                },
+                {
+                    "conname": "conteudos_slug_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL slug"
+                },
+                {
+                    "conname": "conteudos_status_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL status"
+                },
+                {
+                    "conname": "conteudos_titulo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL titulo"
+                },
+                {
+                    "conname": "conteudos_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                },
+                {
+                    "conname": "conteudos_slug_key",
+                    "contype": "u",
+                    "definition": "UNIQUE (slug)"
+                }
+            ]
+        },
+        "eventos": {
+            "count": 0,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('eventos_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "titulo",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 200,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "descricao",
+                    "data_type": "text",
+                    "udt_name": "text",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "data_inicio",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "data_fim",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "local",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 200,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "link_inscricao",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 500,
+                    "is_nullable": "YES",
+                    "column_default": null
+                },
+                {
+                    "column_name": "autor_id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "status",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 20,
+                    "is_nullable": "NO",
+                    "column_default": "'agendado'::character varying"
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_eventos_periodo",
+                    "contype": "c",
+                    "definition": "CHECK (((data_fim IS NULL) OR (data_fim >= data_inicio)))"
+                },
+                {
+                    "conname": "ck_eventos_status",
+                    "contype": "c",
+                    "definition": "CHECK (((status)::text = ANY ((ARRAY['agendado'::character varying, 'realizado'::character varying, 'cancelado'::character varying])::text[])))"
+                },
+                {
+                    "conname": "fk_eventos_autor",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE RESTRICT"
+                },
+                {
+                    "conname": "eventos_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "eventos_autor_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL autor_id"
+                },
+                {
+                    "conname": "eventos_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "eventos_data_inicio_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL data_inicio"
+                },
+                {
+                    "conname": "eventos_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "eventos_status_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL status"
+                },
+                {
+                    "conname": "eventos_titulo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL titulo"
+                },
+                {
+                    "conname": "eventos_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                }
+            ]
+        },
+        "midias": {
+            "count": 0,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('midias_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "nome_arquivo",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 255,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "caminho",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 500,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "tipo_mime",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "tamanho_bytes",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "enviado_por",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_midias_tamanho",
+                    "contype": "c",
+                    "definition": "CHECK ((tamanho_bytes >= 0))"
+                },
+                {
+                    "conname": "fk_midias_usuario",
+                    "contype": "f",
+                    "definition": "FOREIGN KEY (enviado_por) REFERENCES usuarios(id) ON DELETE RESTRICT"
+                },
+                {
+                    "conname": "midias_caminho_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL caminho"
+                },
+                {
+                    "conname": "midias_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "midias_enviado_por_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL enviado_por"
+                },
+                {
+                    "conname": "midias_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "midias_nome_arquivo_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL nome_arquivo"
+                },
+                {
+                    "conname": "midias_tamanho_bytes_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL tamanho_bytes"
+                },
+                {
+                    "conname": "midias_tipo_mime_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL tipo_mime"
+                },
+                {
+                    "conname": "midias_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                }
+            ]
+        },
+        "tags": {
+            "count": 0,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('tags_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "nome",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 80,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "slug",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 100,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_tags_nome",
+                    "contype": "c",
+                    "definition": "CHECK ((char_length(btrim((nome)::text)) > 0))"
+                },
+                {
+                    "conname": "tags_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "tags_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "tags_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "tags_nome_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL nome"
+                },
+                {
+                    "conname": "tags_slug_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL slug"
+                },
+                {
+                    "conname": "tags_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                },
+                {
+                    "conname": "tags_slug_key",
+                    "contype": "u",
+                    "definition": "UNIQUE (slug)"
+                }
+            ]
+        },
+        "usuarios": {
+            "count": 5,
+            "columns": [
+                {
+                    "column_name": "id",
+                    "data_type": "bigint",
+                    "udt_name": "int8",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "nextval('usuarios_id_seq'::regclass)"
+                },
+                {
+                    "column_name": "nome",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 150,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "email",
+                    "data_type": "USER-DEFINED",
+                    "udt_name": "citext",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "senha_hash",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 255,
+                    "is_nullable": "NO",
+                    "column_default": null
+                },
+                {
+                    "column_name": "perfil",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 20,
+                    "is_nullable": "NO",
+                    "column_default": "'aluno'::character varying"
+                },
+                {
+                    "column_name": "status",
+                    "data_type": "character varying",
+                    "udt_name": "varchar",
+                    "character_maximum_length": 20,
+                    "is_nullable": "NO",
+                    "column_default": "'ativo'::character varying"
+                },
+                {
+                    "column_name": "criado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                },
+                {
+                    "column_name": "atualizado_em",
+                    "data_type": "timestamp with time zone",
+                    "udt_name": "timestamptz",
+                    "character_maximum_length": null,
+                    "is_nullable": "NO",
+                    "column_default": "CURRENT_TIMESTAMP"
+                }
+            ],
+            "constraints": [
+                {
+                    "conname": "ck_usuarios_nome",
+                    "contype": "c",
+                    "definition": "CHECK ((char_length(btrim((nome)::text)) >= 3))"
+                },
+                {
+                    "conname": "ck_usuarios_perfil",
+                    "contype": "c",
+                    "definition": "CHECK (((perfil)::text = ANY ((ARRAY['admin'::character varying, 'editor'::character varying, 'aluno'::character varying])::text[])))"
+                },
+                {
+                    "conname": "ck_usuarios_status",
+                    "contype": "c",
+                    "definition": "CHECK (((status)::text = ANY ((ARRAY['ativo'::character varying, 'inativo'::character varying, 'bloqueado'::character varying])::text[])))"
+                },
+                {
+                    "conname": "usuarios_atualizado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL atualizado_em"
+                },
+                {
+                    "conname": "usuarios_criado_em_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL criado_em"
+                },
+                {
+                    "conname": "usuarios_email_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL email"
+                },
+                {
+                    "conname": "usuarios_id_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL id"
+                },
+                {
+                    "conname": "usuarios_nome_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL nome"
+                },
+                {
+                    "conname": "usuarios_perfil_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL perfil"
+                },
+                {
+                    "conname": "usuarios_senha_hash_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL senha_hash"
+                },
+                {
+                    "conname": "usuarios_status_not_null",
+                    "contype": "n",
+                    "definition": "NOT NULL status"
+                },
+                {
+                    "conname": "usuarios_pkey",
+                    "contype": "p",
+                    "definition": "PRIMARY KEY (id)"
+                },
+                {
+                    "conname": "usuarios_email_key",
+                    "contype": "u",
+                    "definition": "UNIQUE (email)"
+                }
+            ]
+        }
+    }
+}

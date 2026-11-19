@@ -1,0 +1,222 @@
+[
+  {
+    "id": "CT-01",
+    "status": "Aprovado",
+    "obtido": "Cadastro HTTP criou conta aluno e redirecionou ao login."
+  },
+  {
+    "id": "CT-02",
+    "status": "Aprovado",
+    "obtido": "E-mail repetido recusado com mensagem de duplicidade."
+  },
+  {
+    "id": "CT-03",
+    "status": "Aprovado",
+    "obtido": "Servidor recusou senha de três caracteres."
+  },
+  {
+    "id": "CT-04",
+    "status": "Aprovado",
+    "obtido": "Servidor recusou nome, e-mail e senha vazios."
+  },
+  {
+    "id": "CT-05",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-06",
+    "status": "Aprovado",
+    "obtido": "password_verify validou a senha conhecida contra senha_hash persistido."
+  },
+  {
+    "id": "CT-07",
+    "status": "Aprovado",
+    "obtido": "Aluno acessa área pública e recebe HTTP 403 no painel; admin entra no painel."
+  },
+  {
+    "id": "CT-08",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-09",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-10",
+    "status": "Aprovado",
+    "obtido": "Rota administrativa sem sessão redirecionou ao login."
+  },
+  {
+    "id": "CT-11",
+    "status": "Aprovado",
+    "obtido": "Botão POST de encerrar sessão invalidou o acesso administrativo."
+  },
+  {
+    "id": "CT-12",
+    "status": "Aprovado",
+    "obtido": "Acesso direto após logout redirecionou ao login."
+  },
+  {
+    "id": "CT-13",
+    "status": "Aprovado",
+    "obtido": "Sessão mantida entre listagem e configuração da Home."
+  },
+  {
+    "id": "CT-14",
+    "status": "Aprovado",
+    "obtido": "Publicação completa com duas imagens, YouTube, autoria e data persistidos."
+  },
+  {
+    "id": "CT-15",
+    "status": "Aprovado",
+    "obtido": "Publicação sem imagem salva com imagem_capa nula e galeria vazia."
+  },
+  {
+    "id": "CT-16",
+    "status": "Aprovado",
+    "obtido": "Cadastro sem título não persistiu registro."
+  },
+  {
+    "id": "CT-17",
+    "status": "Aprovado",
+    "obtido": "Upload de 3 MB recusado; sem publicação criada."
+  },
+  {
+    "id": "CT-18",
+    "status": "Aprovado",
+    "obtido": "PHP renomeado para JPG recusado por validação do conteúdo."
+  },
+  {
+    "id": "CT-19",
+    "status": "Aprovado",
+    "obtido": "Listagem apresentou título, categoria e autor resolvidos."
+  },
+  {
+    "id": "CT-20",
+    "status": "Aprovado",
+    "obtido": "Título alterado; galeria original e arquivos preservados."
+  },
+  {
+    "id": "CT-21",
+    "status": "Aprovado",
+    "obtido": "Imagens antigas removidas e nova imagem persistida em disco."
+  },
+  {
+    "id": "CT-22",
+    "status": "Aprovado",
+    "obtido": "Exclusão por formulário removeu registro e imagem gerenciada."
+  },
+  {
+    "id": "CT-23",
+    "status": "Aprovado",
+    "obtido": "FK recusou DELETE (SQLSTATE 23001); rollback executado"
+  },
+  {
+    "id": "CT-24",
+    "status": "Aprovado",
+    "obtido": "Novo conteúdo foi exibido na Home sem mudança de código."
+  },
+  {
+    "id": "CT-25",
+    "status": "Aprovado",
+    "obtido": "Busca cronológica conferida; fora da busca, destaques têm prioridade própria."
+  },
+  {
+    "id": "CT-26",
+    "status": "Aprovado",
+    "obtido": "Todos os IDs exibidos em Eventos conferidos com a categoria correspondente no banco."
+  },
+  {
+    "id": "CT-27",
+    "status": "Aprovado",
+    "obtido": "Até nove registros por página; página 2 sem repetição dos IDs da primeira."
+  },
+  {
+    "id": "CT-28",
+    "status": "Aprovado",
+    "obtido": "Detalhe exibiu título, autoria, data, corpo e galeria de duas imagens."
+  },
+  {
+    "id": "CT-29",
+    "status": "Aprovado",
+    "obtido": "Iframe com ID validado e proporção 16:9; reprodução externa não homologada."
+  },
+  {
+    "id": "CT-30",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-31",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-32",
+    "status": "Aprovado",
+    "obtido": "Verificação satisfeita no navegador e/ou banco."
+  },
+  {
+    "id": "CT-33",
+    "status": "Aprovado",
+    "obtido": "Identificador com SQL Injection recusado com HTTP 404."
+  },
+  {
+    "id": "CT-34",
+    "status": "Aprovado",
+    "obtido": "Tag script persistida foi exibida como texto, sem execução."
+  },
+  {
+    "id": "CT-35",
+    "status": "Aprovado",
+    "obtido": "HTML com onerror exibido literalmente no corpo."
+  },
+  {
+    "id": "CT-36",
+    "status": "Aprovado",
+    "obtido": "Apache bloqueou arquivo PHP de configuração e arquivo privado com HTTP 403."
+  },
+  {
+    "id": "CT-37",
+    "status": "Aprovado",
+    "obtido": "Servidor PHP isolado com porta de banco inválida devolveu HTTP 500 e mensagem genérica; diagnóstico ficou no log. Apache e banco originais preservados."
+  },
+  {
+    "id": "CT-38",
+    "status": "Aprovado",
+    "obtido": "Mesmo envio HTTP malicioso do CT-18; não houve gravação da publicação ou execução."
+  },
+  {
+    "id": "CT-39",
+    "status": "Aprovado",
+    "obtido": "Home, Notícias e Eventos conferidos em 375 px sem rolagem horizontal."
+  },
+  {
+    "id": "CT-40",
+    "status": "Aprovado",
+    "obtido": "Home, Notícias e Eventos conferidos em 768 px sem rolagem horizontal."
+  },
+  {
+    "id": "CT-41",
+    "status": "Aprovado",
+    "obtido": "Menu de categorias aberto e links de Notícias e Eventos utilizados em 375 px."
+  },
+  {
+    "id": "CT-42",
+    "status": "Aprovado",
+    "obtido": "Imagens do detalhe possuem alt descritivo com título e posição na galeria."
+  },
+  {
+    "id": "CT-43",
+    "status": "Aprovado",
+    "obtido": "Login: Tab percorreu e-mail, senha e envio; foco com sombra de realce visível."
+  },
+  {
+    "id": "CT-44",
+    "status": "Aprovado",
+    "obtido": "Amostra do login: título, rótulos e botão com contraste mínimo 6.72:1; não constitui auditoria completa do portal."
+  }
+]

@@ -1,6 +1,15 @@
 # Portal de Comunicação SI
 
-Portal do curso de Sistemas de Informação das Faculdades ESUCRI, desenvolvido em Projeto de Extensão IV, 6ª fase, 2026/2. Entrega em 12/11/2026. Professor: Me. Jucemar Formigoni Candido.
+Portal do curso de Sistemas de Informação das Faculdades ESUCRI, desenvolvido pela **equipe DSL** em Projeto de Extensão IV, 6ª fase, 2026/2. Entrega consolidada em **19/11/2026**. Professor: Me. Jucemar Formigoni Candido.
+
+## Arquivos da entrega
+
+- [Slides da equipe em PDF](apresentacao/DSL_Slides_Portal-SI.pdf).
+- [Projeto completo compactado](entrega/DSL_Projeto_Portal-SI.zip).
+- [Índice da documentação e roteiro da demonstração](docs/ENTREGA.md).
+- [Login e senha do avaliador](ACESSO_AVALIADOR.txt).
+
+O clone inclui as fotos das 20 publicações de demonstração e o SQL para usar um banco próprio. Para usar o banco remoto já preenchido, siga a seção de acesso do professor abaixo. O repositório foi mantido na conta do Lucas conforme decisão da equipe.
 
 | Integrante | Responsabilidade |
 | --- | --- |
@@ -36,7 +45,7 @@ postgresql://admin:Senha%40123@painel.formasoftware.cloud:5455/porta-si?sslmode=
 
 Inicie o Apache e abra `http://localhost/portal-si/`. Confira que nao ha variaveis `PORTAL_DATABASE_URL` ou `PORTAL_DB_*` sobrescrevendo a conexao. Esse caminho usa o banco remoto ja preenchido: **nao execute o instalador, o schema, as migracoes ou o seed** nele.
 
-Esta conexao foi disponibilizada pela equipe exclusivamente para a avaliacao academica e deixara de funcionar quando o banco temporario for excluido. A senha da conexao acima e do PostgreSQL; o login do painel e separado e deve ser obtido com a equipe. O portal publico pode ser consultado sem login. As fotos das publicacoes existentes precisam ser copiadas da pasta de uploads do pacote de entrega, pois nao sao versionadas; a imagem padrao da Home esta no Git.
+Esta conexao foi disponibilizada pela equipe exclusivamente para a avaliacao academica e deixara de funcionar quando o banco temporario for excluido. A senha da conexao acima e do PostgreSQL; o login do painel esta em [ACESSO_AVALIADOR.txt](ACESSO_AVALIADOR.txt). O portal publico pode ser consultado sem login. As fotos das publicacoes e a imagem padrao da Home acompanham o clone e o ZIP.
 
 ## Instalacao com banco proprio (alternativa)
 
@@ -68,19 +77,19 @@ notepad config\database-uri.local.txt
 
 O instalador imprime o login `avaliador@portal-si.test` e uma senha aleatória: guarde essa senha para entrar no painel. Ele recusa bancos que já possuam tabelas e desfaz a instalação inteira se ocorrer um erro. Não execute schema, migrações ou seed separadamente neste caminho.
 
-6. Inicie o Apache e abra `http://localhost/portal-si/`. Entre com o acesso impresso e cadastre notícias/eventos pelo painel. A Home usa a imagem incluída no Git. Esta instalação começa sem publicações; fotos enviadas e dados do banco da equipe pertencem ao pacote de demonstração descrito abaixo.
+6. Inicie o Apache e abra `http://localhost/portal-si/`. Entre com o acesso impresso e cadastre notícias/eventos pelo painel. A Home usa a imagem incluída no Git. Esta instalação começa sem publicações; para obter as 20 publicações, use a restauração do SQL de demonstração descrita abaixo, em vez do instalador.
 
 ## Conexão atual do projeto
 
 O portal roda no XAMPP em `http://localhost/portal-si/` e utiliza o PostgreSQL do servidor `painel.formasoftware.cloud:5455`, na base `porta-si`. As 20 publicações, categorias e configuração da Home já estão nessa base. As fotos continuam em `public/uploads/` no computador que executa o portal.
 
-A conexão está no arquivo privado `config/database-uri.local.txt`, ignorado pelo Git. O administrador do portal é `admin@esucri.com.br`, com a senha definida para a demonstração. A configuração anterior do banco local foi preservada em um backup privado dentro de `config/`. Não é necessário importar novamente o SQL no banco remoto para usar esta instalação.
+A conexão local desta instalação está em `config/database-uri.local.txt`, ignorado pelo Git; o URI temporário para avaliação foi disponibilizado acima por decisão da equipe. Use a conta própria de avaliador descrita em [ACESSO_AVALIADOR.txt](ACESSO_AVALIADOR.txt). As contas anteriores da equipe foram preservadas. Não é necessário importar novamente o SQL no banco remoto para usar esta instalação.
 
 ## Instalação com os dados de demonstração
 
-1. Copie a pasta do código para `C:\xampp\htdocs\portal-si` e inicie o Apache.
+1. Clone o repositório ou extraia a pasta `portal-si` do ZIP para `C:\xampp\htdocs\portal-si` e inicie o Apache.
 2. No PostgreSQL, crie uma base **vazia** chamada `portal_si`.
-3. Restaure `Banco/portal_si_demonstracao.sql`, incluído no pacote de entrega, nessa base. O arquivo reúne estrutura e dados; não aplique o seed depois dele.
+3. Restaure `Banco/portal_si_demonstracao.sql`, incluído no Git e no ZIP, nessa base. O arquivo reúne estrutura e dados; não aplique o seed depois dele.
 4. Crie `config/database-uri.local.txt`, usando sua própria senha do PostgreSQL:
 
 ```text
@@ -91,7 +100,7 @@ Se a senha contiver caracteres reservados de URL, codifique-os (`@` vira `%40`, 
 
 5. Preserve as pastas `public/uploads/publicacoes/` e `public/uploads/inicio/` do pacote; o SQL referencia os arquivos pelos caminhos relativos.
 6. Abra `http://localhost/portal-si/`.
-7. Para entrar no painel, use o acesso de demonstração indicado em `ACESSO_AVALIADOR.txt`, entregue separadamente do repositório.
+7. Para entrar no painel, use o acesso de demonstração indicado em [ACESSO_AVALIADOR.txt](ACESSO_AVALIADOR.txt), incluído no Git e no ZIP.
 
 Exemplo de restauração no PowerShell, ajustando o caminho do pacote:
 
@@ -144,7 +153,7 @@ As suítes criam dados temporários e fazem rollback ou restauração ao termina
 
 Senhas usam `password_hash` e `password_verify`; formulários mutáveis exigem CSRF, sessões são regeneradas após login, saídas textuais recebem escape e consultas usam parâmetros. Uploads aceitam JPG, PNG, WebP e GIF: até dez imagens por publicação, 2 MB por arquivo, 6 MB por envio e 25 megapixels por imagem, com conferência de MIME e dimensões. Arquivos recebem nomes aleatórios e proteção do Apache. Ao remover imagens ou excluir uma publicação, os arquivos gerenciados correspondentes são removidos.
 
-O código é servido no caminho XAMPP indicado acima; não se deve afirmar que apenas `public/` fica exposta nessa instalação. As regras `.htaccess` precisam permanecer no pacote. Credenciais `config/*.local.*`, backups e uploads não são versionados. O pacote completo inclui as fotos necessárias à demonstração; um clone do Git sozinho não as contém.
+O código é servido no caminho XAMPP indicado acima; não se deve afirmar que apenas `public/` fica exposta nessa instalação. As regras `.htaccess` precisam permanecer no pacote. Arquivos `config/*.local.*`, backups e novos uploads não são versionados. As fotos necessárias à demonstração estão versionadas e acompanham tanto o clone quanto o ZIP. O URI e o acesso de avaliação foram publicados expressamente para este banco acadêmico temporário.
 
 ## Limitações e continuidade
 

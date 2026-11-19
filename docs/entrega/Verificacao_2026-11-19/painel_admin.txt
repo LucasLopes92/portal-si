@@ -1,0 +1,15 @@
+[OK] 01 - estrutura obrigatória do banco
+[OK] 02 - autenticação e autorização por perfil
+[OK] 03 - CSRF e escape de saída
+[OK] 04 - validação do cadastro
+[OK] 05 - cadastro e listagem paginada
+[OK] 06 - listagem pública completa e ordenada
+[OK] 07 - busca por palavra, data e filtros combinados
+[OK] 08 - integração com a Home pública
+[OK] 09 - resumo do dashboard
+[OK] 10 - edição e retirada da Home
+[OK] 11 - exclusão definitiva
+[OK] 12 - proteção das rotas administrativas
+[OK] 13 - rollback dos registros temporários
+
+Todos os 13 testes do painel passaram.

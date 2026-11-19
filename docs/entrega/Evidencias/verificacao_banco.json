@@ -1,0 +1,21 @@
+{
+  "banco": "portal_si",
+  "valido": true,
+  "problemas": [],
+  "tabelas": [
+    "auditoria",
+    "categorias",
+    "configuracao_inicio",
+    "conteudo_tags",
+    "conteudos",
+    "eventos",
+    "midias",
+    "tags",
+    "usuarios"
+  ],
+  "registros_preservados": {
+    "usuarios": 5,
+    "categorias": 6,
+    "conteudos": 20
+  }
+}

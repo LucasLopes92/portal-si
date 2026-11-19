@@ -1,0 +1,28 @@
+{
+    "banco": "portal_si_entrega_680997f826",
+    "conexao": {
+        "usuario": "postgres",
+        "servidor": "127.0.0.1\/32",
+        "porta": 5432,
+        "ssl": false,
+        "versao": "PostgreSQL 18.4 on x86_64-windows, compiled by msvc-19.44.35226, 64-bit"
+    },
+    "valido": true,
+    "problemas": [],
+    "tabelas": [
+        "auditoria",
+        "categorias",
+        "configuracao_inicio",
+        "conteudo_tags",
+        "conteudos",
+        "eventos",
+        "midias",
+        "tags",
+        "usuarios"
+    ],
+    "registros_preservados": {
+        "usuarios": 5,
+        "categorias": 6,
+        "conteudos": 20
+    }
+}

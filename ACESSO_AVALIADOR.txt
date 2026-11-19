@@ -1,0 +1,16 @@
+PORTAL SI - EQUIPE DSL - ACESSO DE AVALIACAO
+
+URL do portal: http://localhost/portal-si/
+URL de login: http://localhost/portal-si/app/views/admin/login.php
+E-mail: avaliador@portal-si.test
+Senha: PortalSI-6f5bc4c0cf!
+Perfil: admin
+
+Esse acesso funciona no banco remoto temporario indicado no README e na
+copia local restaurada de Banco/portal_si_demonstracao.sql.
+O instalador de banco vazio (database/instalar_avaliacao.php) gera outra
+senha e a imprime no terminal; use essa senha se escolher essa alternativa.
+
+A senha acima e do painel. A conexao do PostgreSQL esta no README.
+Nao execute o seed ou o instalador no banco remoto ja preenchido.
+O acesso remoto termina quando a equipe excluir o banco temporario.

@@ -1,0 +1,2 @@
+PASS: Home, editorials, search, pagination, detail and assets
+PASS: restricted dashboard, evaluator login, content list, Home editor and logout

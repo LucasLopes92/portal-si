@@ -1,0 +1,1 @@
+[OK] Persistência, imagem preservada, limites, campos obrigatórios, destino seguro, enquadramento e envio inválido.
