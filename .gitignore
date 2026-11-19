@@ -1,4 +1,7 @@
 # Credenciais privadas da conexao e backups de banco.
+.env
+.env.*
+!.env.example
 /config/*.local.*
 /database/backups/
 /public/uploads/publicacoes/

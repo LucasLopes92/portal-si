@@ -26,6 +26,44 @@ A versão atual utiliza PHP, HTML e CSS, sem JavaScript próprio. Para visualiza
 
 Ambiente verificado: Windows, Apache/XAMPP, PHP 8.2.12 e PostgreSQL 18.4 local na porta 5432. No PHP, habilite `pdo_pgsql`, `pgsql`, `mbstring` e `fileinfo`. O PostgreSQL precisa disponibilizar a extensão `citext`. O Apache deve permitir as regras `.htaccess` (`AllowOverride All`) e escrita em `public/uploads/`.
 
+## Instalação pelo clone (professor / avaliador)
+
+Este caminho usa somente os arquivos versionados e um PostgreSQL próprio do avaliador. Não depende das credenciais do banco da equipe nem do pacote de entrega. O portal carrega variáveis do ambiente do PHP ou `config/database-uri.local.txt`; ele **não carrega `.env` automaticamente**.
+
+1. Instale XAMPP/PHP e PostgreSQL com os requisitos acima. No `C:\xampp\php\php.ini`, habilite as extensões indicadas e reinicie o Apache.
+2. Clone na pasta do Apache:
+
+```powershell
+git clone https://github.com/LucasLopes92/portal-si.git C:\xampp\htdocs\portal-si
+cd C:\xampp\htdocs\portal-si
+```
+
+3. Crie um banco **novo e vazio** usando a senha do seu PostgreSQL. Ajuste a versão no caminho se necessário:
+
+```powershell
+& 'C:\Program Files\PostgreSQL\18\bin\createdb.exe' -h 127.0.0.1 -U postgres portal_si
+Copy-Item config\database-uri.example.txt config\database-uri.local.txt
+notepad config\database-uri.local.txt
+```
+
+4. No arquivo copiado, substitua `SUA_SENHA` pela senha do PostgreSQL do avaliador. Codifique caracteres reservados na senha (`@` como `%40`, `#` como `%23`, `%` como `%25`). O exemplo usa conexão local; não contém credenciais reais. Confira que não há variáveis `PORTAL_DATABASE_URL` ou `PORTAL_DB_*` sobrescrevendo essa configuração.
+5. Instale as tabelas, seis categorias e um administrador de avaliação:
+
+```powershell
+& 'C:\xampp\php\php.exe' database\instalar_avaliacao.php --confirmar-banco-vazio
+& 'C:\xampp\php\php.exe' database\verificar_banco.php
+```
+
+O instalador imprime o login `avaliador@portal-si.test` e uma senha aleatória: guarde essa senha para entrar no painel. Ele recusa bancos que já possuam tabelas e desfaz a instalação inteira se ocorrer um erro. Não execute schema, migrações ou seed separadamente neste caminho.
+
+6. Inicie o Apache e abra `http://localhost/portal-si/`. Entre com o acesso impresso e cadastre notícias/eventos pelo painel. A Home usa a imagem incluída no Git. Esta instalação começa sem publicações; fotos enviadas e dados do banco da equipe pertencem ao pacote de demonstração descrito abaixo.
+
+### Para acessar o mesmo banco remoto da equipe
+
+Solicite à equipe o URI de conexão por canal privado e salve-o em `config/database-uri.local.txt` (ou use `PORTAL_DATABASE_URL`). Obtenha também o login do portal por canal privado. Não execute o instalador, schema ou seed nesse banco existente. Para visualizar as fotos das publicações existentes, obtenha também a pasta de uploads da equipe.
+
+As credenciais reais e os arquivos `config/*.local.*` ficam fora do Git. A senha do PostgreSQL dá acesso ao banco; o login do painel é uma credencial separada. Um clone não recebe essas credenciais automaticamente.
+
 ## Conexão atual do projeto
 
 O portal roda no XAMPP em `http://localhost/portal-si/` e utiliza o PostgreSQL do servidor `painel.formasoftware.cloud:5455`, na base `porta-si`. As 20 publicações, categorias e configuração da Home já estão nessa base. As fotos continuam em `public/uploads/` no computador que executa o portal.
